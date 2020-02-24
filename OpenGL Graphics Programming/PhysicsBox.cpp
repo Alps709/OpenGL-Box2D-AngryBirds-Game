@@ -1,4 +1,5 @@
 #include "PhysicsBox.h"
+#include "Obj.h"
 
 PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size)
 {
@@ -18,6 +19,12 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.3f;
 	m_fixture = m_body->CreateFixture(&fixtureDef);
+
+	
+
+	m_mesh = new Mesh(Objects::verticesBoid, Objects::indicesBoid);
+	m_shader = new Shader();
+
 }
 
 PhysicsBox::~PhysicsBox()

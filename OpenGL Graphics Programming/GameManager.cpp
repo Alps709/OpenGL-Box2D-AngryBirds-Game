@@ -188,8 +188,7 @@ std::vector<Boid>& GameManager::GetBoids()
 
 Boid GameManager::MakeBoid()
 {
-	++m_boidIDCounter;
-	return Boid(m_boidIDCounter, m_boidMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
+	return Boid(++m_boidIDCounter, m_boidMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
 }
 
 
