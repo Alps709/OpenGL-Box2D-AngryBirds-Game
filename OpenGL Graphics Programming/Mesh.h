@@ -34,7 +34,8 @@ public:
 	unsigned int m_indicesCount{0};
 };
 
-namespace std {
+namespace std 
+{
 	//Hashing function for when I want the Mesh class to be able to be used as a key in an unordered_map
 	template <>
 	struct std::hash<Mesh>

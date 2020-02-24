@@ -151,11 +151,10 @@
     <ClCompile Include="clock.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MasterRenderer.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="PhysicsBox.cpp" />
     <ClCompile Include="Pill.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="Boid.cpp" />
@@ -174,6 +173,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Obj.h" />
+    <ClInclude Include="PhysicsBox.h" />
     <ClInclude Include="Pill.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
