@@ -2,7 +2,6 @@
 #include <freeglut.h>
 #include <iostream>
 #include <fmod.hpp>
-#include "vld.h"
 
 #include "TextLabel.h"
 

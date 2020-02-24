@@ -163,7 +163,7 @@ void GameManager::Render()
 			path.push_back(glm::vec2((Utils::HSCREEN_WIDTH)/ Utils::HSCREEN_WIDTH, 0));
 
 			//Draw a line from each point of the path to the next
-			for (int i = 0; i < path.size() - 1; ++i)
+			for (unsigned int i = 0; i < path.size() - 1; ++i)
 			{
 				glm::vec2 a = path[i];
 				glm::vec2 b = path[i + 1];

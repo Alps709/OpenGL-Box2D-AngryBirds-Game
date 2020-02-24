@@ -232,7 +232,7 @@ glm::vec2 Boid::PathFollowing(Path _path)
 	const glm::vec2 predictedPosition = m_position + (glm::normalize(m_velocity) * 25.0f);
 
 	//Check distance for the normal of each path segment
-	for(int i = 0; i < m_path.m_pathPoints.size() - 1; ++i)
+	for(unsigned int i = 0; i < m_path.m_pathPoints.size() - 1; ++i)
 	{
 		glm::vec2 a = m_path.m_pathPoints[i];
 		glm::vec2 b = m_path.m_pathPoints[i + 1];

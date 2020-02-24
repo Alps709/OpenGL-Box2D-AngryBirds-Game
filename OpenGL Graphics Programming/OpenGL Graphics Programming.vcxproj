@@ -22,32 +22,32 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5DA9CC1C-F6D9-43E6-90FF-66C06C35D38C}</ProjectGuid>
     <RootNamespace>OpenGLGraphicsProgramming</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(ProjectDir)Dependencies\fmod;$(ProjectDir)Dependencies\freeglut;$(ProjectDir)Dependencies\soil;$(ProjectDir)Dependencies\glew;$(ProjectDir)Dependencies\vld;$(ProjectDir)Dependencies\glm;$(ProjectDir)Dependencies;$(ProjectDir)Dependencies\freetype;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)Dependencies\vld;$(ProjectDir)Dependencies\glew;$(ProjectDir)Dependencies\freeglut;$(ProjectDir)Dependencies\soil;$(ProjectDir)Dependencies\glm;$(ProjectDir)Dependencies;$(ProjectDir)Dependencies\fmod;$(ProjectDir)Dependencies\freetype;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)Dependencies\Box2D;$(ProjectDir)Dependencies\fmod;$(ProjectDir)Dependencies\freeglut;$(ProjectDir)Dependencies\soil;$(ProjectDir)Dependencies\glew;$(ProjectDir)Dependencies\vld;$(ProjectDir)Dependencies\glm;$(ProjectDir)Dependencies;$(ProjectDir)Dependencies\freetype;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)Dependencies\Box2D;$(ProjectDir)Dependencies\vld;$(ProjectDir)Dependencies\glew;$(ProjectDir)Dependencies\freeglut;$(ProjectDir)Dependencies\soil;$(ProjectDir)Dependencies\glm;$(ProjectDir)Dependencies;$(ProjectDir)Dependencies\fmod;$(ProjectDir)Dependencies\freetype;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)Dependencies\fmod;$(ProjectDir)Dependencies\freeglut;$(ProjectDir)Dependencies\soil;$(ProjectDir)Dependencies\glew;$(ProjectDir)Dependencies\vld;$(ProjectDir)Dependencies\glm;$(ProjectDir)Dependencies;$(ProjectDir)Dependencies\freetype;$(LibraryPath)</LibraryPath>
@@ -95,7 +95,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;freeglut.lib;glew32.lib;SOIL.lib;fmod_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;freeglut.lib;glew32.lib;SOIL.lib;fmod_vc.lib;freetype.lib;box2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>

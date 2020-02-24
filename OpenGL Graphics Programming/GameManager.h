@@ -5,6 +5,7 @@
 #include "clock.h"
 #include "Pill.h"
 #include "Boid.h"
+#include <box2d.h>
 
 #include <fmod.hpp>
 
