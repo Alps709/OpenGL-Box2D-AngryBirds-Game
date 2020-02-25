@@ -16,7 +16,7 @@ GameManager::GameManager()
 	//Create defaut shader
 	m_defaultShader = new Shader();
 
-	m_boidMesh = new Mesh(Objects::verticesBoid, Objects::indicesBoid);
+	//m_boidMesh = new Mesh(Objects::verticesBoid, Objects::indicesBoid);
 
 	//Set background mesh and texture
 	m_backgroundMesh = new Mesh(Objects::verticesBackground, Objects::indicesBackground);
@@ -27,13 +27,13 @@ GameManager::GameManager()
 	m_backgroundObject.SetTexture0(m_backgroundTexture);
 
 	//Create the text objects
-	m_boidStateText = new TextLabel("Behaviour: Seek", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 40.0f));
-	m_containmentStateText = new TextLabel("Containment: Off", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 80.0f));
-	m_menuTitleText = new TextLabel("The Boid Game!", "Resources/Fonts/kirbyss.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.8f);
+	//m_boidStateText = new TextLabel("Behaviour: Seek", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 40.0f));
+	//m_containmentStateText = new TextLabel("Containment: Off", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 80.0f));
+	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/kirbyss.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.8f);
 	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/kirbyss.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 
 	//Create original boid
-	m_boids.push_back(MakeBoid());
+	//m_boids.push_back(MakeBoid());
 
 	//Create the camera
 	//Pass in false to say it is not using an orthographic view initially (it will then use a perspective view projection)
@@ -51,7 +51,7 @@ GameManager::GameManager()
 	groundBox.SetAsBox(5000.0f, 10.0f);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(1.0f, 50.0f * i), glm::vec2(10.0f, 10.0f), 1.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
@@ -65,13 +65,13 @@ GameManager::~GameManager()
 	//Delete all the heap allocated objects and clean up others
 	m_yeatSound->release();
 	m_audioSystem->release();
-	delete m_boidStateText;
+	//delete m_boidStateText;
 	delete m_containmentStateText;
 	delete m_menuTitleText;
 	delete m_menuInstructText;
 	delete m_backgroundMesh;
 	delete m_backgroundTexture;
-	delete m_boidMesh;
+	//delete m_boidMesh;
 	delete m_defaultShader;
 	delete m_camera;
 }
@@ -134,11 +134,11 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 	if (m_gameState == GAME_PLAY)
 	{
-		//Render boids
-		for (Boid& boid : m_boids)
-		{
-			boid.Process(m_gameplayState, m_boids, m_containment, _mousePosX, _mousePosY, m_clock.GetDeltaTick());
-		}
+		////Render boids
+		//for (Boid& boid : m_boids)
+		//{
+		//	boid.Process(m_gameplayState, m_boids, m_containment, _mousePosX, _mousePosY, m_clock.GetDeltaTick());
+		//}
 
 		for (auto& pBox : m_boxes)
 		{
@@ -184,8 +184,8 @@ void GameManager::Render()
 			pBox.Render(*m_camera);
 		}
 
-		m_boidStateText->Render();
-		m_containmentStateText->Render();
+		//m_boidStateText->Render();
+		//m_containmentStateText->Render();
 
 		if (m_gameplayState == PLAY_FOLLOWPATH)
 		{
