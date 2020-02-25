@@ -16,9 +16,6 @@
     <Filter Include="Header Files\Utils">
       <UniqueIdentifier>{2951005c-2f8f-4c26-b86d-53bfe886c7c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\RenderEngine">
-      <UniqueIdentifier>{1b3be459-bcbb-47c0-82c9-d2e3849afe99}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{206e7c79-c50a-4c01-8160-18aab171d38e}</UniqueIdentifier>
     </Filter>
@@ -91,12 +88,6 @@
     </ClInclude>
     <ClInclude Include="clock.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files\RenderEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="MasterRenderer.h">
-      <Filter>Header Files\RenderEngine</Filter>
     </ClInclude>
     <ClInclude Include="Obj.h">
       <Filter>Header Files\Utils</Filter>

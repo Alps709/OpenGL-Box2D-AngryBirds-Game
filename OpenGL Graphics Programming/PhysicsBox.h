@@ -1,6 +1,7 @@
 #pragma once
 
 #include <box2d.h>
+#include "Math.h"
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -12,11 +13,12 @@ class PhysicsBox
 {
 public:
 	PhysicsBox() = default;
-	PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size);
-	virtual ~PhysicsBox();
+	PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size, float density = 1.0f);
+	~PhysicsBox();
 
 	//Getters
-	b2Vec2 GetPosition() const { return m_body->GetPosition(); }
+	b2Body* GetBody(){ return m_body; }
+	glm::vec2 GetSize(){ return m_size; }
 
 	void SetTexture0(Texture* _tex);
 	/*void SetTexture1(Texture* _tex);*/

@@ -5,6 +5,7 @@
 #include "clock.h"
 #include "Pill.h"
 #include "Boid.h"
+#include "PhysicsBox.h"
 #include <box2d.h>
 
 #include <fmod.hpp>
@@ -35,6 +36,7 @@ public:
 
 	void Update(int _mousePosX, int _mousePosY);
 	void Render();
+	void Clear();
 
 	bool& GetContainment() { return m_containment; }
 	std::vector<Boid>& GetBoids();
@@ -57,7 +59,15 @@ private:
 	//Camera
 	Camera* m_camera = nullptr;
 
+	//Box 2D stuff
+	std::unique_ptr<b2World> m_World;
+	b2Vec2 m_gravity = { 0.0, -9.8 };
+
 	///Objects
+
+	//Box 2D boxes
+	std::vector<PhysicsBox> m_boxes;
+
 	//Boids
 	bool m_containment = false;
 	int m_boidIDCounter = 0;
@@ -76,7 +86,6 @@ private:
 	TextLabel* m_menuTitleText = nullptr;
 	TextLabel* m_menuInstructText = nullptr;
 	
-
 	//Audio
 	inline static FMOD::System* m_audioSystem = nullptr;
 	inline static FMOD::Sound* m_yeatSound = nullptr;

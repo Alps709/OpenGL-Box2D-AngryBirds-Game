@@ -1,6 +1,5 @@
 #include "GameManager.h"
 #include "Obj.h"
-#include "Renderer.h"
 
 #include <fmod.h>
 #include "Input.h"
@@ -39,6 +38,25 @@ GameManager::GameManager()
 	//Create the camera
 	//Pass in false to say it is not using an orthographic view initially (it will then use a perspective view projection)
 	m_camera = new Camera(true);
+
+	//Box 2D stuff
+	m_World = std::make_unique<b2World>(m_gravity);
+
+	// Make the ground
+	b2BodyDef groundBodyDef;
+	groundBodyDef.position.Set(0.0f, -25.0f);
+	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
+	// Make the ground fixture
+	b2PolygonShape groundBox;
+	groundBox.SetAsBox(5000.0f, 10.0f);
+	groundBody->CreateFixture(&groundBox, 0.0f);
+
+	for (int i = 0; i < 20; i++)
+	{
+		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(1.0f, 50.0f * i), glm::vec2(10.0f, 10.0f), 1.0f);
+		tempBox.SetTexture0(m_backgroundTexture);
+		m_boxes.push_back(tempBox);
+	}
 }
 
 
@@ -121,10 +139,20 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 		{
 			boid.Process(m_gameplayState, m_boids, m_containment, _mousePosX, _mousePosY, m_clock.GetDeltaTick());
 		}
+
+		for (auto& pBox : m_boxes)
+		{
+			b2Vec2 boxPos = pBox.GetBody()->GetPosition();
+		    glm::vec2 boxSize = pBox.GetSize();
+			pBox.SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox.GetBody()->GetAngle()), boxSize.x, boxSize.y);
+		}
 	}
 
 	//Update sounds
 	m_audioSystem->update();
+
+	//Update physics simulation
+	m_World->Step(1.0f/60.0f, 6, 6);
 
 	//Tell glut to call the render function again
 	glutPostRedisplay();
@@ -133,10 +161,10 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 void GameManager::Render()
 {
 	//Clear the screen before every frame
-	Renderer::Clear();
+	Clear();
 
 	//Draw background
-	m_backgroundObject.Render(*m_camera);
+	//m_backgroundObject.Render(*m_camera);
 
 	if (m_gameState == GAME_MENU)
 	{
@@ -149,6 +177,11 @@ void GameManager::Render()
 		for (Boid& boid : m_boids)
 		{
 			boid.Render(*m_camera);
+		}
+
+		for (PhysicsBox& pBox : m_boxes)
+		{
+			pBox.Render(*m_camera);
 		}
 
 		m_boidStateText->Render();
@@ -179,6 +212,12 @@ void GameManager::Render()
 
 	glutSwapBuffers();
 	u_frameNum++;
+}
+
+void GameManager::Clear()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 std::vector<Boid>& GameManager::GetBoids()

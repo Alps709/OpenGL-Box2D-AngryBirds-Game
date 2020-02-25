@@ -27,11 +27,26 @@ namespace Objects
 		-Utils::HSCREEN_WIDTH,  Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    //Top left
 		 Utils::HSCREEN_WIDTH,  Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    //Top right
 		 Utils::HSCREEN_WIDTH, -Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    //Bottom right
-
-		 
 	};
 
 	static std::vector<unsigned int> indicesBackground =
+	{
+		//First quad							
+		0, 2, 1,
+		0, 3, 2,
+	};
+
+	static std::vector<float> verticesBox =
+	{
+		///Bottom right quad
+		//Position			     //Colour			        //Texture co-ords
+		-0.5f, -0.5f, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f,    //Bottom left
+		-0.5f,  0.5f, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    //Top left
+		 0.5f,  0.5f, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    //Top right
+		 0.5f, -0.5f, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    //Bottom right
+	};
+
+	static std::vector<unsigned int> indicesBox =
 	{
 		//First quad							
 		0, 2, 1,
