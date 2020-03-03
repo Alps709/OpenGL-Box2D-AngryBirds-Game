@@ -51,7 +51,7 @@ GameManager::GameManager()
 	groundBox.SetAsBox(5000.0f, 10.0f);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(1.0f, 50.0f * i), glm::vec2(10.0f, 10.0f), 1.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
@@ -164,7 +164,7 @@ void GameManager::Render()
 	Clear();
 
 	//Draw background
-	//m_backgroundObject.Render(*m_camera);
+	m_backgroundObject.Render(*m_camera);
 
 	if (m_gameState == GAME_MENU)
 	{
@@ -173,12 +173,6 @@ void GameManager::Render()
 	}
 	else if (m_gameState == GAME_PLAY)
 	{
-		//Render boids
-		for (Boid& boid : m_boids)
-		{
-			boid.Render(*m_camera);
-		}
-
 		for (PhysicsBox& pBox : m_boxes)
 		{
 			pBox.Render(*m_camera);
@@ -186,28 +180,6 @@ void GameManager::Render()
 
 		//m_boidStateText->Render();
 		//m_containmentStateText->Render();
-
-		if (m_gameplayState == PLAY_FOLLOWPATH)
-		{
-			std::vector<glm::vec2> path;
-			path.push_back(glm::vec2((-Utils::HSCREEN_WIDTH)/ Utils::HSCREEN_WIDTH, 0));
-			path.push_back(glm::vec2((-Utils::HSCREEN_WIDTH/2)/ Utils::HSCREEN_WIDTH, (Utils::HSCREEN_HEIGHT/ 2)/ Utils::HSCREEN_HEIGHT));
-			path.push_back(glm::vec2((Utils::HSCREEN_WIDTH/2)/ Utils::HSCREEN_WIDTH, (-Utils::HSCREEN_HEIGHT/ 2)/ Utils::HSCREEN_HEIGHT));
-			path.push_back(glm::vec2((Utils::HSCREEN_WIDTH)/ Utils::HSCREEN_WIDTH, 0));
-
-			//Draw a line from each point of the path to the next
-			for (unsigned int i = 0; i < path.size() - 1; ++i)
-			{
-				glm::vec2 a = path[i];
-				glm::vec2 b = path[i + 1];
-
-				glBegin(GL_LINES);
-				glColor3f(0.0f, 0.0f, 0.0f);
-				glVertex3f(a.x, a.y, 0.0f);
-				glVertex3f(b.x, b.y, 0.0f);
-				glEnd();
-			}
-		}
 	}
 
 	glutSwapBuffers();
