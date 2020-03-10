@@ -53,14 +53,13 @@ GameManager::GameManager()
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
-	for (int i = 0; i < 5000; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(0.0f, 500.0f * i), glm::vec2(50.0f, 50.0f), 10000.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
 		m_boxes.push_back(tempBox);
 	}
 }
-
 
 GameManager::~GameManager()
 {
