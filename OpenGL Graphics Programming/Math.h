@@ -2,6 +2,7 @@
 #include "glm.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
+#include <box2d.h>
 
 namespace Math
 {
@@ -18,6 +19,24 @@ namespace Math
 
 		//Return model matrix
 		return translationMatrix * rotationMatrixZ * scaleMatrix;
+	}
+
+	const unsigned int Box2DScale = 100;
+
+	inline glm::vec2 Box2DtoVec2(b2Vec2 _vec)
+	{
+		glm::vec2 temp;
+		temp.x = _vec.x / Box2DScale;
+		temp.y = _vec.y / Box2DScale;
+		return temp;
+	}
+
+	inline b2Vec2 Vec2toBox2D(glm::vec2 _vec)
+	{
+		b2Vec2 temp;
+		temp.x = _vec.x / Box2DScale;
+		temp.y = _vec.y / Box2DScale;
+		return temp;
 	}
 
 	inline void LimitVector2D(glm::vec2& _vec, float _maxVal)

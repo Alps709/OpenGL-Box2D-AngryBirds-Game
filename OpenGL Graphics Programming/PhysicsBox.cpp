@@ -8,11 +8,13 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 	// Make the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(position.x, position.y);
+	const auto temp = Math::Vec2toBox2D(position);
+	bodyDef.position.Set(temp.x, temp.y);
 	m_body = world->CreateBody(&bodyDef);
-
+	
+	const auto temp1 = Math::Vec2toBox2D(size);
 	b2PolygonShape boxShape;
-	boxShape.SetAsBox(size.x / 2.0f, size.y / 2.0f);
+	boxShape.SetAsBox(temp1.x / 2.0f, temp1.y / 2.0f);
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &boxShape;
@@ -21,7 +23,7 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 	m_fixture = m_body->CreateFixture(&fixtureDef);
 
 	m_mesh = new Mesh(Objects::verticesBox, Objects::indicesBox);
-	m_shader = new Shader();
+	m_shader = new Shader("Shaders/PhysicsBoxVS.shader", "Shaders/PhysicsBoxFS.shader");
 }
 
 PhysicsBox::~PhysicsBox()
@@ -82,8 +84,4 @@ void PhysicsBox::BindTexture(unsigned int _texNum) const
 	{
 		m_tex0->Bind();
 	}
-	//else if (_texNum == 1)
-	//{
-	//	m_tex1->Bind();
-	//}
 }
