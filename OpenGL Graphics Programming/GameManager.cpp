@@ -43,17 +43,19 @@ GameManager::GameManager()
 	m_World = std::make_unique<b2World>(m_gravity);
 
 	// Make the ground
+	auto tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -Utils::HSCREEN_HEIGHT));
 	b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(0.0f, -25.0f);
+	groundBodyDef.position.Set(tempPos.x, tempPos.y);
 	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
 	// Make the ground fixture
+	auto tempSize = Math::Vec2toBox2D(glm::vec2(50000.0f, 0.0f));
 	b2PolygonShape groundBox;
-	groundBox.SetAsBox(5000.0f, 10.0f);
+	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 5000; i++)
 	{
-		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(1.0f, 50.0f * i), glm::vec2(10.0f, 10.0f), 1.0f);
+		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(0.0f, 500.0f * i), glm::vec2(50.0f, 50.0f), 10000.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
 		m_boxes.push_back(tempBox);
 	}
@@ -142,17 +144,17 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 		for (auto& pBox : m_boxes)
 		{
-			b2Vec2 boxPos = pBox.GetBody()->GetPosition();
+			glm::vec2 boxPos = Math::Box2DtoVec2(pBox.GetBody()->GetPosition());
 		    glm::vec2 boxSize = pBox.GetSize();
 			pBox.SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox.GetBody()->GetAngle()), boxSize.x, boxSize.y);
 		}
+
+		//Update physics simulation only during play
+		m_World->Step(1.0f / 60.0f, 6, 6);
 	}
 
 	//Update sounds
 	m_audioSystem->update();
-
-	//Update physics simulation
-	m_World->Step(1.0f/60.0f, 6, 6);
 
 	//Tell glut to call the render function again
 	glutPostRedisplay();
@@ -164,7 +166,7 @@ void GameManager::Render()
 	Clear();
 
 	//Draw background
-	m_backgroundObject.Render(*m_camera);
+	//m_backgroundObject.Render(*m_camera);
 
 	if (m_gameState == GAME_MENU)
 	{
