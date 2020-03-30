@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 {
 	//Setup and create at glut controlled window
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize((int)Utils::SCREEN_WIDTH, (int)Utils::SCREEN_HEIGHT);
 	glutCreateWindow("The Snek Game - By Anton Le Prevost-Smith");
@@ -303,6 +303,10 @@ void SetGlobalGLSettings()
 
 	//Doesn't draw stuff that is not facing the screen
 	//GLCall(glEnable(GL_CULL_FACE));
+
+	//Enable multisampling anti-aliasing with 4 samples per pixel
+	glutSetOption(GLUT_MULTISAMPLE, 4);
+	glEnable(GL_MULTISAMPLE);
 
 	//Setup alpha blending
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
