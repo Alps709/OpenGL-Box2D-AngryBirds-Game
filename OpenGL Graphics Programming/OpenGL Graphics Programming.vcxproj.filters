@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Object stuff">
       <UniqueIdentifier>{971ff6ec-82ae-4837-8706-f31e6296a39c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PhysicsObjects">
+      <UniqueIdentifier>{c9e6a9f3-51ac-4f4d-846d-6e99871779c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics objects">
+      <UniqueIdentifier>{dc96889e-7c35-4528-8548-808b8c5e5196}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -73,7 +79,7 @@
       <Filter>Source Files\Characters</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\PhysicsObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,7 +135,7 @@
       <Filter>Header Files\Characters</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsBox.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Physics objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

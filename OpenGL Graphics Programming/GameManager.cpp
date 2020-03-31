@@ -29,7 +29,7 @@ GameManager::GameManager()
 	//Create the text objects
 	//m_boidStateText = new TextLabel("Behaviour: Seek", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 40.0f));
 	//m_containmentStateText = new TextLabel("Containment: Off", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 80.0f));
-	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/kirbyss.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.8f);
+	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/kirbyss.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/kirbyss.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 
 	//Create original boid
@@ -53,9 +53,9 @@ GameManager::GameManager()
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(0.0f, 500.0f * i), glm::vec2(50.0f, 50.0f), 10000.0f);
+		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(0.0f, 500.0f * i), glm::vec2(100.0f, 100.0f), 100.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
 		m_boxes.push_back(tempBox);
 	}
