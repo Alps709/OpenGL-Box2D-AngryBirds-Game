@@ -45,16 +45,29 @@ GameManager::GameManager()
 	//Box 2D stuff
 	m_World = std::make_unique<b2World>(m_gravity);
 
-	// Make the ground
-	auto tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -Utils::HSCREEN_HEIGHT));
+	// Make the screen borders
+
+	//Ground border
+	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -Utils::HSCREEN_HEIGHT));
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(tempPos.x, tempPos.y);
 	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
 	// Make the ground fixture
-	auto tempSize = Math::Vec2toBox2D(glm::vec2(50000.0f, 0.0f));
+	auto tempSize = Math::Vec2toBox2D(glm::vec2(Utils::HSCREEN_WIDTH, 0.0f));
 	b2PolygonShape groundBox;
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
+
+	//Left wall border
+	tempPos = Math::Vec2toBox2D(glm::vec2(-Utils::HSCREEN_WIDTH, 00.0f));
+	b2BodyDef leftWallBodyDef;
+	leftWallBodyDef.position.Set(tempPos.x, tempPos.y);
+	b2Body* groundBody1 = m_World->CreateBody(&leftWallBodyDef);
+	// Make the ground fixture
+	auto tempSize1 = Math::Vec2toBox2D(glm::vec2(0.0, Utils::HSCREEN_HEIGHT));
+	b2PolygonShape groundBox1;
+	groundBox1.SetAsBox(tempSize1.x, tempSize1.y);
+	groundBody1->CreateFixture(&groundBox1, 0.0f);
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -62,7 +75,7 @@ GameManager::GameManager()
 		tempBox.SetTexture0(m_backgroundTexture);
 		m_physicsBoxes.push_back(tempBox);
 
-		PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-200.0f + i, 500.0f * i), 50.0f, 10.0f);
+		PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-200.0f + i, 500.0f * i), 50.0f, 100.0f);
 		tempCircle.SetTexture0(m_circleTexture);
 		m_physicsCircles.push_back(tempCircle);
 	}

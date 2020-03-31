@@ -62,7 +62,7 @@ private:
 
 	//Box 2D stuff
 	std::unique_ptr<b2World> m_World;
-	b2Vec2 m_gravity = { 0.0, -9.8 };
+	b2Vec2 m_gravity = { 0.0, -1.0 };
 
 	///Objects
 
