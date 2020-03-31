@@ -37,7 +37,6 @@ public:
 	//Render is overidden by all derived classes, but can still be used for a base object
 	virtual void Render(Camera& _myCamera);
 
-	
 	void BindTexture(unsigned int _texNum) const;
 
 protected:

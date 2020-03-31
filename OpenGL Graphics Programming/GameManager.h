@@ -6,6 +6,7 @@
 #include "Pill.h"
 #include "Boid.h"
 #include "PhysicsBox.h"
+#include "PhysicsCircle.h"
 #include <box2d.h>
 
 #include <fmod.hpp>
@@ -65,8 +66,9 @@ private:
 
 	///Objects
 
-	//Box 2D boxes
-	std::vector<PhysicsBox> m_boxes;
+	//Box 2D Physics Objects
+	std::vector<PhysicsBox> m_physicsBoxes;
+	std::vector<PhysicsCircle> m_physicsCircles;
 
 	//Boids
 	bool m_containment = false;
@@ -78,6 +80,9 @@ private:
 	Object m_backgroundObject;
 	Mesh* m_backgroundMesh = nullptr;
 	Texture* m_backgroundTexture = nullptr;
+
+	//Circle Texture
+	Texture* m_circleTexture = nullptr;
 
 	//Default shader
 	Shader* m_defaultShader = nullptr;

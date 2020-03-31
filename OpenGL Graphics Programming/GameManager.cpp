@@ -22,6 +22,9 @@ GameManager::GameManager()
 	m_backgroundMesh = new Mesh(Objects::verticesBackground, Objects::indicesBackground);
 	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
 
+	//Circle texture
+	m_circleTexture = new Texture("Resources/Images/Circle.png", 0);
+
 	//Create 1 background object
 	m_backgroundObject = Object(m_backgroundMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
 	m_backgroundObject.SetTexture0(m_backgroundTexture);
@@ -55,9 +58,13 @@ GameManager::GameManager()
 
 	for (int i = 0; i < 5; i++)
 	{
-		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(0.0f, 500.0f * i), glm::vec2(100.0f, 100.0f), 100.0f);
+		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, 500.0f * i), glm::vec2(100.0f, 100.0f), 10.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
-		m_boxes.push_back(tempBox);
+		m_physicsBoxes.push_back(tempBox);
+
+		PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-200.0f + i, 500.0f * i), 50.0f, 10.0f);
+		tempCircle.SetTexture0(m_circleTexture);
+		m_physicsCircles.push_back(tempCircle);
 	}
 }
 
@@ -72,7 +79,6 @@ GameManager::~GameManager()
 	delete m_menuInstructText;
 	delete m_backgroundMesh;
 	delete m_backgroundTexture;
-	//delete m_boidMesh;
 	delete m_defaultShader;
 	delete m_camera;
 }
@@ -135,17 +141,18 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 	if (m_gameState == GAME_PLAY)
 	{
-		////Render boids
-		//for (Boid& boid : m_boids)
-		//{
-		//	boid.Process(m_gameplayState, m_boids, m_containment, _mousePosX, _mousePosY, m_clock.GetDeltaTick());
-		//}
-
-		for (auto& pBox : m_boxes)
+		for (auto& pBox : m_physicsBoxes)
 		{
 			glm::vec2 boxPos = Math::Box2DtoVec2(pBox.GetBody()->GetPosition());
 		    glm::vec2 boxSize = pBox.GetSize();
 			pBox.SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox.GetBody()->GetAngle()), boxSize.x, boxSize.y);
+		}
+
+		for (auto& pCircle : m_physicsCircles)
+		{
+			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle.GetBody()->GetPosition());
+			float circleRadius = pCircle.GetRadius();
+			pCircle.SetPRS(circlePos.x, circlePos.y, glm::degrees(pCircle.GetBody()->GetAngle()), circleRadius * 2.0f, circleRadius * 2.0f);
 		}
 
 		//Update physics simulation only during play
@@ -174,9 +181,14 @@ void GameManager::Render()
 	}
 	else if (m_gameState == GAME_PLAY)
 	{
-		for (PhysicsBox& pBox : m_boxes)
+		for (PhysicsBox& pBox : m_physicsBoxes)
 		{
 			pBox.Render(*m_camera);
+		}
+
+		for (PhysicsCircle& pCircle : m_physicsCircles)
+		{
+			pCircle.Render(*m_camera);
 		}
 
 		//m_boidStateText->Render();

@@ -33,6 +33,16 @@ namespace Math
 		return b2Vec2(_vec.x / Box2DScale, _vec.y / Box2DScale);
 	}
 
+	inline float FloatToBox2D(float _float)
+	{
+		return _float/Box2DScale;
+	}
+
+	inline float Box2DToFloat(float _float)
+	{
+		return _float * Box2DScale;
+	}
+
 	inline void LimitVector2D(glm::vec2& _vec, float _maxVal)
 	{
 		if(glm::length(_vec) > _maxVal)
