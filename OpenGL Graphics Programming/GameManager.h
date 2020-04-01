@@ -35,6 +35,9 @@ public:
 
 	//void AudioInitialise();
 
+	//Create the physical screen borders for the box 2d world
+	void CreateScreenBorders();
+
 	void Update(int _mousePosX, int _mousePosY);
 	void Render();
 	void Clear();

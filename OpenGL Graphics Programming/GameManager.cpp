@@ -4,7 +4,6 @@
 #include <fmod.h>
 #include "Input.h"
 
-
 GameManager::GameManager()
 {
 	//Start clock
@@ -46,28 +45,8 @@ GameManager::GameManager()
 	m_World = std::make_unique<b2World>(m_gravity);
 
 	// Make the screen borders
-
-	//Ground border
-	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -Utils::HSCREEN_HEIGHT));
-	b2BodyDef groundBodyDef;
-	groundBodyDef.position.Set(tempPos.x, tempPos.y);
-	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
-	// Make the ground fixture
-	auto tempSize = Math::Vec2toBox2D(glm::vec2(Utils::HSCREEN_WIDTH, 0.0f));
-	b2PolygonShape groundBox;
-	groundBox.SetAsBox(tempSize.x, tempSize.y);
-	groundBody->CreateFixture(&groundBox, 0.0f);
-
-	//Left wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(-Utils::HSCREEN_WIDTH, 00.0f));
-	b2BodyDef leftWallBodyDef;
-	leftWallBodyDef.position.Set(tempPos.x, tempPos.y);
-	b2Body* groundBody1 = m_World->CreateBody(&leftWallBodyDef);
-	// Make the ground fixture
-	auto tempSize1 = Math::Vec2toBox2D(glm::vec2(0.0, Utils::HSCREEN_HEIGHT));
-	b2PolygonShape groundBox1;
-	groundBox1.SetAsBox(tempSize1.x, tempSize1.y);
-	groundBody1->CreateFixture(&groundBox1, 0.0f);
+	CreateScreenBorders();
+	
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -228,4 +207,36 @@ Boid GameManager::MakeBoid()
 	return Boid(++m_boidIDCounter, m_boidMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
 }
 
+void GameManager::CreateScreenBorders()
+{
+	//Ground border
+	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -Utils::HSCREEN_HEIGHT));
+	b2BodyDef groundBodyDef;
+	groundBodyDef.position.Set(tempPos.x, tempPos.y);
+	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
+	// Make the ground fixture
+	auto tempSize = Math::Vec2toBox2D(glm::vec2(Utils::HSCREEN_WIDTH, 0.0f));
+	b2PolygonShape groundBox;
+	groundBox.SetAsBox(tempSize.x, tempSize.y);
+	groundBody->CreateFixture(&groundBox, 0.0f);
 
+	//Left wall border
+	tempPos = Math::Vec2toBox2D(glm::vec2(-Utils::HSCREEN_WIDTH, 00.0f));
+	b2BodyDef leftWallBody;
+	leftWallBody.position.Set(tempPos.x, tempPos.y);
+	groundBody = m_World->CreateBody(&leftWallBody);
+	// Make the ground fixture
+	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, Utils::HSCREEN_HEIGHT));
+	groundBox.SetAsBox(tempSize.x, tempSize.y);
+	groundBody->CreateFixture(&groundBox, 0.0f);
+
+	//Right wall border
+	tempPos = Math::Vec2toBox2D(glm::vec2(Utils::HSCREEN_WIDTH, 00.0f));
+	b2BodyDef rightWallBody;
+	rightWallBody.position.Set(tempPos.x, tempPos.y);
+	groundBody = m_World->CreateBody(&rightWallBody);
+	// Make the ground fixture
+	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, Utils::HSCREEN_HEIGHT));
+	groundBox.SetAsBox(tempSize.x, tempSize.y);
+	groundBody->CreateFixture(&groundBox, 0.0f);
+}
