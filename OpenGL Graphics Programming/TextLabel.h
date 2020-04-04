@@ -17,11 +17,9 @@
 #include <utility>
 
 //Local includes
+#include "InputManager.h"
 #include "ShaderLoader.h"
 #include "Shader.h"
-#include "Utils.h"
-
-
 
 struct FontChar
 {
@@ -51,6 +49,8 @@ public:
 	void SetColor(glm::vec3 _colour) { m_colour = _colour; }
 	void SetScale(GLfloat _scale) { m_scale = _scale; }
 	void SetPosition(glm::vec2 _pos) { m_position = _pos; }
+
+	InputManager& inputManager = InputManager::getInstance();
 
 private:
 

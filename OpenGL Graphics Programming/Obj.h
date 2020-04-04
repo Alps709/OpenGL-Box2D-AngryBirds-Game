@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
-#include "Utils.h"
+#include "InputManager.h"
 
 namespace Objects
 {
+	inline InputManager& inputManagerO = InputManager::getInstance();
+
 	static std::vector<float> verticesBoid =
 	{
 		///Bottom right quad
@@ -23,10 +25,10 @@ namespace Objects
 	{
 		///Bottom right quad
 		//Position			     //Colour			        //Texture co-ords
-		-Utils::HSCREEN_WIDTH, -Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f,    //Bottom left
-		-Utils::HSCREEN_WIDTH,  Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    //Top left
-		 Utils::HSCREEN_WIDTH,  Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    //Top right
-		 Utils::HSCREEN_WIDTH, -Utils::HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    //Bottom right
+		-inputManagerO.HSCREEN_WIDTH, -inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f,    //Bottom left
+		-inputManagerO.HSCREEN_WIDTH,  inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    //Top left
+		 inputManagerO.HSCREEN_WIDTH,  inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    //Top right
+		 inputManagerO.HSCREEN_WIDTH, -inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    //Bottom right
 	};
 
 	static std::vector<unsigned int> indicesBackground =

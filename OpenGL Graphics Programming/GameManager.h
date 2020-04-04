@@ -1,10 +1,9 @@
 #pragma once
+#include "InputManager.h"
 #include "TextLabel.h"
 #include "Texture.h"
 #include "Object.h"
 #include "clock.h"
-#include "Pill.h"
-#include "Boid.h"
 #include "PhysicsBox.h"
 #include "PhysicsCircle.h"
 #include <box2d.h>
@@ -34,6 +33,7 @@ public:
 	~GameManager();
 
 	//void AudioInitialise();
+	void ProcessInput();
 
 	//Create the physical screen borders for the box 2d world
 	void CreateScreenBorders();
@@ -42,10 +42,6 @@ public:
 	void Render();
 	void Clear();
 
-	bool& GetContainment() { return m_containment; }
-	std::vector<Boid>& GetBoids();
-	Boid MakeBoid();
-
 	TextLabel* m_boidStateText = nullptr;
 	TextLabel* m_containmentStateText = nullptr;
 
@@ -53,6 +49,8 @@ public:
 	inline static GameplayState m_gameplayState = PLAY_SEEK;
 
 private:
+	InputManager& inputManager = InputManager::getInstance();
+
 	//Game variables
 	unsigned int m_gameScore = 0;
 	
@@ -72,12 +70,6 @@ private:
 	//Box 2D Physics Objects
 	std::vector<PhysicsBox> m_physicsBoxes;
 	std::vector<PhysicsCircle> m_physicsCircles;
-
-	//Boids
-	bool m_containment = false;
-	int m_boidIDCounter = 0;
-	std::vector<Boid> m_boids;
-	Mesh* m_boidMesh = nullptr;
 
 	//Game Background
 	Object m_backgroundObject;
@@ -103,5 +95,8 @@ private:
 	//Uniforms
 	GLfloat u_currentTime = 0;
 	int u_frameNum = 0;
+
+	//Debug stuff
+	bool WireframeRenderMode = false;
 };
 

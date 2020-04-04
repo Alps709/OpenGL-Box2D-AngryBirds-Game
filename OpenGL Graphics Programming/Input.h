@@ -1,130 +1,101 @@
 #pragma once
-#include "Utils.h"
+#include "Debug.h"
+#include "InputManager.h"
+#include "Math.h"
 #include <freeglut.h>
 
-namespace Input
+//Callback functions for glut input
+namespace
 {
+	inline InputManager& inputManagerI = InputManager::getInstance();
+
 	enum InputState
 	{
-		INPUT_NULL = 0,
+		INPUT_NULL = 0, //Default key state (can be used to tell is a key has ever been pressed)
 		INPUT_UP = 1,
 		INPUT_DOWN = 2,
 		INPUT_UP_FIRST = 3,
 		INPUT_DOWN_FIRST = 4,
 	};
 
-	static int g_mousePosX = (int)(Utils::HSCREEN_WIDTH);
-	static int g_mousePosY = (int)(Utils::HSCREEN_HEIGHT);
-	static int g_mousePosDifX = 0;
-	static int g_mousePosDifY = 0;
-
-	//Mouse Input
-	static InputState MouseState[3];
-
-	//Keyboard input
-	static InputState KeyState[255];
-	static InputState SpecialKeyState[255];
-
 	//Declared inputs to be handled that have an uppercase and lowercase version
-	static unsigned char inputs[10] = { 'w', 'a', 's', 'd', 'p', 'W', 'A', 'S', 'D', 'P' };
+	unsigned char inputs[10] = { 'w', 'a', 's', 'd', 'p', 'W', 'A', 'S', 'D', 'P' };
 
-	static void MouseClick(int _button, int _state, int _x, int _y)
+	void MouseClick(int _button, int _state, int _x, int _y)
 	{
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
-		_x -= (int)(Utils::HSCREEN_WIDTH);
-		_y -= (int)(Utils::HSCREEN_HEIGHT);
+		_x -= (int)(inputManagerI.HSCREEN_WIDTH);
+		_y -= (int)(inputManagerI.HSCREEN_HEIGHT);
 
 		//Invert y axis
 		_y *= -1;
 
-		if (_button >= 3)
+		//We are not using any buttons higher than 2, so don't bother doing anything
+		if (_button > 2)
+		{
 			return;
-		g_mousePosDifX = _x - g_mousePosX;
-		g_mousePosDifY = _y - g_mousePosY;
-
-		if (Utils::CAMERA_ORTHOGRAPHIC_MODE)
-		{
-			g_mousePosX = _x;
-			g_mousePosY = _y;
-		}
-		else
-		{
-			glutWarpPointer((int)Utils::HSCREEN_WIDTH, (int)Utils::HSCREEN_HEIGHT);
-			g_mousePosX = (int)Utils::HSCREEN_WIDTH;
-			g_mousePosY = (int)Utils::HSCREEN_HEIGHT;
 		}
 
-		MouseState[_button] = (GLUT_DOWN == _state) ? INPUT_DOWN_FIRST : INPUT_UP_FIRST;
+		//Get the x and y difference since last frame
+		inputManagerI.g_mousePosDifX = _x - inputManagerI.g_mousePosX;
+		inputManagerI.g_mousePosDifY = _y - inputManagerI.g_mousePosY;
+
+		//Set mouse pos
+		inputManagerI.g_mousePosX = _x;
+		inputManagerI.g_mousePosY = _y;
+
+		inputManagerI.MouseState[_button] = (GLUT_DOWN == _state) ? inputManagerI.INPUT_DOWN_FIRST : inputManagerI.INPUT_UP_FIRST;
 		//Debug logging
 		//std::cout << "Mouse clicked on - x: " << _x << " | y: " << _y << std::endl;
 	}
 
-	static void MousePassiveMove(int _x, int _y)
+	void MousePassiveMove(int _x, int _y)
 	{
 		//Convert current screen width and height mouse co-ords to 
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
-		_x = (int)(Utils::remap(_x, -Utils::TRUE_HSCREEN_WIDTH, Utils::TRUE_HSCREEN_WIDTH, -Utils::HSCREEN_WIDTH, Utils::HSCREEN_WIDTH) - Utils::HSCREEN_WIDTH);
-		_y = (int)(Utils::remap(_y, -Utils::TRUE_HSCREEN_HEIGHT, Utils::TRUE_HSCREEN_HEIGHT, -Utils::HSCREEN_HEIGHT, Utils::HSCREEN_HEIGHT) - Utils::HSCREEN_HEIGHT);
+		//(remaps screen size mouse coords to opengl pixel coords)
+		_x = (int)(Math::remap(_x, -inputManagerI.TRUE_HSCREEN_WIDTH, inputManagerI.TRUE_HSCREEN_WIDTH, -inputManagerI.HSCREEN_WIDTH, inputManagerI.HSCREEN_WIDTH) - inputManagerI.HSCREEN_WIDTH);
+		_y = (int)(Math::remap(_y, -inputManagerI.TRUE_HSCREEN_HEIGHT, inputManagerI.TRUE_HSCREEN_HEIGHT, -inputManagerI.HSCREEN_HEIGHT, inputManagerI.HSCREEN_HEIGHT) - inputManagerI.HSCREEN_HEIGHT);
 
 		//Invert y axis
 		_y *= -1;
 
-		g_mousePosDifX = _x - g_mousePosX;
-		g_mousePosDifY = _y - g_mousePosY;
+		inputManagerI.g_mousePosX = _x;
+		inputManagerI.g_mousePosY = _y;
 
-		if (Utils::CAMERA_ORTHOGRAPHIC_MODE)
-		{
-			g_mousePosX = _x;
-			g_mousePosY = _y;
-		}
-		else
-		{
-			glutWarpPointer((int)Utils::HSCREEN_WIDTH, (int)Utils::HSCREEN_HEIGHT);
-			g_mousePosX = (int)Utils::HSCREEN_WIDTH;
-			g_mousePosY = (int)Utils::HSCREEN_HEIGHT;
-		}
-		//Debug logging
+		////Debug logging
 		//std::cout << "Mouse moved to - x: " << _x << " | y: " << _y << std::endl;
-		//std::cout << "Mouse change in - x: " << g_mousePosDifX << " | y: " << g_mousePosDifY << std::endl;
+		//std::cout << "Mouse change in - x: " << inputManager.g_mousePosDifX << " | y: " << inputManager.g_mousePosDifY << std::endl;
 	}
 
-	static void MouseMove(int _x, int _y)
+	void MouseMove(int _x, int _y)
 	{
+		//Convert current screen width and height mouse co-ords to 
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
-		_x -= (int)Utils::HSCREEN_WIDTH;
-		_y -= (int)Utils::HSCREEN_HEIGHT;
+		//(remaps screen size mouse coords to opengl pixel coords)
+		_x = (int)(Math::remap(_x, -inputManagerI.TRUE_HSCREEN_WIDTH, inputManagerI.TRUE_HSCREEN_WIDTH, -inputManagerI.HSCREEN_WIDTH, inputManagerI.HSCREEN_WIDTH) - inputManagerI.HSCREEN_WIDTH);
+		_y = (int)(Math::remap(_y, -inputManagerI.TRUE_HSCREEN_HEIGHT, inputManagerI.TRUE_HSCREEN_HEIGHT, -inputManagerI.HSCREEN_HEIGHT, inputManagerI.HSCREEN_HEIGHT) - inputManagerI.HSCREEN_HEIGHT);
 
 		//Invert y axis
 		_y *= -1;
 
-		g_mousePosDifX = _x - g_mousePosX;
-		g_mousePosDifY = _y - g_mousePosY;
+		inputManagerI.g_mousePosX = _x;
+		inputManagerI.g_mousePosY = _y;
 
-		if (Utils::CAMERA_ORTHOGRAPHIC_MODE)
-		{
-			g_mousePosX = _x;
-			g_mousePosY = _y;
-		}
-		else
-		{
-			glutWarpPointer((int)Utils::HSCREEN_WIDTH, (int)Utils::HSCREEN_HEIGHT);
-			g_mousePosX = (int)Utils::HSCREEN_WIDTH;
-			g_mousePosY = (int)Utils::HSCREEN_HEIGHT;
-		}
 		//Debug logging
 		//std::cout << "Mouse clicked on - x: " << _x << " | y: " << _y << std::endl;
 		//std::cout << "Mouse change in - x: " << g_mousePosDifX << " | y: " << g_mousePosDifY << std::endl;
 	}
 
-	static void KeyBoardUp(unsigned char _key, int _x, int _y)
+	void KeyBoardUp(unsigned char _key, int _x, int _y)
 	{
-		const InputState tempState = KeyState[_key];
+		const int tempState = inputManagerI.KeyState[_key];
 
 		//Find offset of the corresponding uppercase or lowercase key
 		const int offset = (_key < 97) ? 32 : -32;
 
 		//If the key is down
-		if (tempState != INPUT_UP && tempState != INPUT_UP_FIRST)
+		if (tempState != inputManagerI.INPUT_UP && tempState != inputManagerI.INPUT_UP_FIRST)
 		{
 			//Loop through the currently handled input keys
 			for (unsigned char input : inputs)
@@ -133,64 +104,64 @@ namespace Input
 				if (_key == input)
 				{
 					//Set the the corresponding uppercase or lowercase key aswell
-					KeyState[_key + offset] = INPUT_UP_FIRST;
+					inputManagerI.KeyState[_key + offset] = inputManagerI.INPUT_UP_FIRST;
 					break;
 				}
 			}
 			//Continue to change keystate as normal
-			KeyState[_key] = INPUT_UP_FIRST;
+			inputManagerI.KeyState[_key] = inputManagerI.INPUT_UP_FIRST;
 		}
 	}
 
-	static void KeyBoardDown(unsigned char _key, int _x, int _y)
+	void KeyBoardDown(unsigned char _key, int _x, int _y)
 	{
-		const InputState tempState = KeyState[_key];
+		const int tempState = inputManagerI.KeyState[_key];
 		const int offset = (_key < 97) ? 32 : -32;
 
 		//Key is up
-		if (tempState != INPUT_DOWN && tempState != INPUT_DOWN_FIRST)
+		if (tempState != inputManagerI.INPUT_DOWN && tempState != inputManagerI.INPUT_DOWN_FIRST)
 		{
 			for (unsigned char input : inputs)
 			{
 				if (_key == input)
 				{
-					KeyState[_key + offset] = INPUT_DOWN_FIRST;
+					inputManagerI.KeyState[_key + offset] = inputManagerI.INPUT_DOWN_FIRST;
 					break;
 				}
 			}
-			KeyState[_key] = INPUT_DOWN_FIRST;
+			inputManagerI.KeyState[_key] = inputManagerI.INPUT_DOWN_FIRST;
 		}
 	}
 
 	//Special key up function
-	static void SpecialKeyBoardUp(int _key, int _x, int _y)
+	void SpecialKeyBoardUp(int _key, int _x, int _y)
 	{
-		const InputState tempState = SpecialKeyState[_key];
+		const int tempState = inputManagerI.SpecialKeyState[_key];
 
-		if (tempState != INPUT_UP && tempState != INPUT_UP_FIRST)
+		if (tempState != inputManagerI.INPUT_UP && tempState != inputManagerI.INPUT_UP_FIRST)
 		{
-			SpecialKeyState[_key] = INPUT_UP_FIRST;
+			inputManagerI.SpecialKeyState[_key] = inputManagerI.INPUT_UP_FIRST;
 		}
 	}
 
 	//Special key down function
-	static void SpecialKeyBoardDown(int _key, int _x, int _y)
+	void SpecialKeyBoardDown(int _key, int _x, int _y)
 	{
-		const InputState tempState = SpecialKeyState[_key];
+		const int tempState = inputManagerI.SpecialKeyState[_key];
 
-		if (tempState != INPUT_DOWN && tempState != INPUT_DOWN_FIRST)
+		if (tempState != inputManagerI.INPUT_DOWN && tempState != inputManagerI.INPUT_DOWN_FIRST)
 		{
-			SpecialKeyState[_key] = INPUT_DOWN_FIRST;
+			inputManagerI.SpecialKeyState[_key] = inputManagerI.INPUT_DOWN_FIRST;
 		}
 	}
 
-	static void WindowResize(int _x, int _y)
+	void WindowResize(int _x, int _y)
 	{
-		Utils::TRUE_SCREEN_WIDTH = (float)_x;
-		Utils::TRUE_SCREEN_HEIGHT = (float)_y;
-		Utils::TRUE_HSCREEN_HEIGHT = Utils::TRUE_SCREEN_HEIGHT / 2;
-		Utils::TRUE_HSCREEN_WIDTH = Utils::TRUE_SCREEN_WIDTH / 2;
+		inputManagerI.TRUE_SCREEN_WIDTH = (float)_x;
+		inputManagerI.TRUE_SCREEN_HEIGHT = (float)_y;
+		inputManagerI.TRUE_HSCREEN_HEIGHT = inputManagerI.TRUE_SCREEN_HEIGHT / 2;
+		inputManagerI.TRUE_HSCREEN_WIDTH = inputManagerI.TRUE_SCREEN_WIDTH / 2;
 
-		glViewport((GLsizei)0, (GLsizei)0, (GLsizei)Utils::TRUE_SCREEN_WIDTH, (GLsizei)Utils::TRUE_SCREEN_HEIGHT);
+		glViewport((GLsizei)0, (GLsizei)0, (GLsizei)inputManagerI.TRUE_SCREEN_WIDTH, (GLsizei)inputManagerI.TRUE_SCREEN_HEIGHT);
 	}
 }

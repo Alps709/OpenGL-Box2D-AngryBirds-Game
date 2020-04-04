@@ -69,20 +69,17 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pill.cpp">
-      <Filter>Source Files\Characters</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Source Files\Object stuff</Filter>
-    </ClCompile>
-    <ClCompile Include="Boid.cpp">
-      <Filter>Source Files\Characters</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsBox.cpp">
       <Filter>Source Files\PhysicsObjects</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsCircle.cpp">
       <Filter>Source Files\PhysicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -99,9 +96,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Obj.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Math.h">
@@ -125,23 +119,20 @@
     <ClInclude Include="GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Pill.h">
-      <Filter>Header Files\Characters</Filter>
-    </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Header Files\Object stuff</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Boid.h">
-      <Filter>Header Files\Characters</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsBox.h">
       <Filter>Header Files\Physics objects</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsCircle.h">
       <Filter>Header Files\Physics objects</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

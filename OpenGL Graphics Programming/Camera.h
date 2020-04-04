@@ -1,5 +1,6 @@
 #pragma once
 #include "gtc/matrix_transform.hpp"
+#include "InputManager.h"
 
 class Camera
 {
@@ -27,6 +28,8 @@ public:
 
 
 private:
+	InputManager& inputManager = InputManager::getInstance();
+
 	//Camera vectors
 	bool m_isOrthographicView;
 	glm::vec3 m_camPosition;

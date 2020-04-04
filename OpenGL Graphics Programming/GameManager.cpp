@@ -1,8 +1,10 @@
 #include "GameManager.h"
+#include "Input.h"
 #include "Obj.h"
 
 #include <fmod.h>
-#include "Input.h"
+
+
 
 GameManager::GameManager()
 {
@@ -29,10 +31,10 @@ GameManager::GameManager()
 	m_backgroundObject.SetTexture0(m_backgroundTexture);
 
 	//Create the text objects
-	//m_boidStateText = new TextLabel("Behaviour: Seek", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 40.0f));
-	//m_containmentStateText = new TextLabel("Containment: Off", "Resources/Fonts/arial.ttf", glm::vec2(-Utils::HSCREEN_WIDTH + 20.0f, Utils::HSCREEN_HEIGHT - 80.0f));
-	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/kirbyss.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
-	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/kirbyss.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
+	//m_boidStateText = new TextLabel("Behaviour: Seek", "Resources/Fonts/arial.ttf", glm::vec2(-_inputManager.HSCREEN_HEIGHT + 20.0f, _inputManager.HSCREEN_HEIGHT - 40.0f));
+	//m_containmentStateText = new TextLabel("Containment: Off", "Resources/Fonts/arial.ttf", glm::vec2(-_inputManager.HSCREEN_HEIGHT + 20.0f, _inputManager.HSCREEN_HEIGHT - 80.0f));
+	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
+	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/Arial.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 
 	//Create original boid
 	//m_boids.push_back(MakeBoid());
@@ -126,10 +128,41 @@ GameManager::~GameManager()
 //
 //}
 
+void GameManager::ProcessInput()
+{
+	//Enter key is pressed
+	if (inputManager.KeyState[13] == INPUT_DOWN || inputManager.KeyState[13] == INPUT_DOWN_FIRST)
+	{
+		//Start game from menu by pressing the enter key
+		if (m_gameState == GAME_MENU)
+		{
+			//Set game state to play
+			m_gameState = GAME_PLAY;
+		}
+	}
+
+	//'O' key is pressed
+	if (inputManager.KeyState['o'] == INPUT_DOWN_FIRST || inputManager.KeyState['O'] == INPUT_DOWN_FIRST)
+	{
+		//Turn wireframe mode on/off
+		WireframeRenderMode = !WireframeRenderMode;
+
+		if (WireframeRenderMode)
+		{
+			GLCall(glPolygonMode(GL_FRONT, GL_LINE));
+		}
+		else
+		{
+			GLCall(glPolygonMode(GL_FRONT, GL_FILL));
+		}
+	}
+}
+
 void GameManager::Update(int _mousePosX, int _mousePosY)
 {
 	//Update clock
 	m_clock.Process();
+	ProcessInput();
 
 	if (m_gameState == GAME_PLAY)
 	{
@@ -152,7 +185,10 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 	}
 
 	//Update sounds
-	m_audioSystem->update();
+	//m_audioSystem->update();
+
+	//Update key states with new input
+	inputManager.Update();
 
 	//Tell glut to call the render function again
 	glutPostRedisplay();
@@ -197,46 +233,36 @@ void GameManager::Clear()
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
-std::vector<Boid>& GameManager::GetBoids()
-{
-	return m_boids;
-}
-
-Boid GameManager::MakeBoid()
-{
-	return Boid(++m_boidIDCounter, m_boidMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
-}
-
 void GameManager::CreateScreenBorders()
 {
 	//Ground border
-	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -Utils::HSCREEN_HEIGHT));
+	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -inputManager.HSCREEN_HEIGHT));
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(tempPos.x, tempPos.y);
 	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
 	// Make the ground fixture
-	auto tempSize = Math::Vec2toBox2D(glm::vec2(Utils::HSCREEN_WIDTH, 0.0f));
+	auto tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_HEIGHT, 0.0f));
 	b2PolygonShape groundBox;
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Left wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(-Utils::HSCREEN_WIDTH, 00.0f));
+	tempPos = Math::Vec2toBox2D(glm::vec2(-inputManager.HSCREEN_HEIGHT, 00.0f));
 	b2BodyDef leftWallBody;
 	leftWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&leftWallBody);
-	// Make the ground fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, Utils::HSCREEN_HEIGHT));
+	// Make the fixture
+	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Right wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(Utils::HSCREEN_WIDTH, 00.0f));
+	tempPos = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_HEIGHT, 00.0f));
 	b2BodyDef rightWallBody;
 	rightWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&rightWallBody);
-	// Make the ground fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, Utils::HSCREEN_HEIGHT));
+	// Make the fixture
+	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 }

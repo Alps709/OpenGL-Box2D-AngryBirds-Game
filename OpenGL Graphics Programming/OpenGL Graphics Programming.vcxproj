@@ -93,6 +93,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;freeglut.lib;glew32.lib;SOIL.lib;fmod_vc.lib;freetype.lib;box2d.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -122,6 +123,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -150,15 +152,14 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="clock.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PhysicsBox.cpp" />
     <ClCompile Include="PhysicsCircle.cpp" />
-    <ClCompile Include="Pill.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
-    <ClCompile Include="Boid.cpp" />
     <ClCompile Include="TextLabel.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexBufferInfo.cpp" />
@@ -169,19 +170,17 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Obj.h" />
     <ClInclude Include="PhysicsBox.h" />
     <ClInclude Include="PhysicsCircle.h" />
-    <ClInclude Include="Pill.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderLoader.h" />
-    <ClInclude Include="Boid.h" />
     <ClInclude Include="TextLabel.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexBufferInfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
