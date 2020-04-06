@@ -73,6 +73,11 @@ TextLabel::TextLabel(const std::string& _text, const std::string& _font, glm::ve
 	glBindVertexArray(0);
 }
 
+TextLabel::~TextLabel()
+{
+	m_characters.erase(m_characters.begin(), m_characters.end());
+}
+
 void TextLabel::Render()
 {
 	//Bind shader and pass the uniforms

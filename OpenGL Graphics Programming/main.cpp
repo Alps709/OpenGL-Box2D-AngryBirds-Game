@@ -73,6 +73,11 @@ void Render()
 
 void Update()
 {
+	if (inputManager.KeyState['r'] == INPUT_DOWN_FIRST)
+	{
+		delete myGameManager;
+		myGameManager = new GameManager();
+	}
 	myGameManager->Update(inputManager.g_mousePosX, inputManager.g_mousePosY);
 
 	//Update key states with new input

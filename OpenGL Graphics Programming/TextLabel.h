@@ -42,7 +42,7 @@ public:
 		float _scale = 1.0f
 	);
 
-	~TextLabel() = default;
+	~TextLabel();
 
 	void Render();
 	void SetText(std::string _text) { m_text = _text; }
