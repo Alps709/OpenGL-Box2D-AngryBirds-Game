@@ -37,6 +37,12 @@
     <Filter Include="Header Files\Physics objects">
       <UniqueIdentifier>{dc96889e-7c35-4528-8548-808b8c5e5196}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{46c307e6-dc71-4948-ba75-0f75e7941d09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{116acda6-4138-4ae7-9990-24642e8f7429}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,7 +85,7 @@
       <Filter>Source Files\PhysicsObjects</Filter>
     </ClCompile>
     <ClCompile Include="InputManager.cpp">
-      <Filter>Source Files\Utils</Filter>
+      <Filter>Source Files\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,11 +134,11 @@
     <ClInclude Include="PhysicsCircle.h">
       <Filter>Header Files\Physics objects</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Input.h">
-      <Filter>Header Files\Utils</Filter>
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

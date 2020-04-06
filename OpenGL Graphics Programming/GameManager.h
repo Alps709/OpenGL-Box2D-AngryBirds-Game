@@ -35,6 +35,8 @@ public:
 	//void AudioInitialise();
 	void ProcessInput();
 
+	void CheckMouseCollisions();
+
 	//Create the physical screen borders for the box 2d world
 	void CreateScreenBorders();
 
@@ -50,6 +52,10 @@ public:
 
 private:
 	InputManager& inputManager = InputManager::getInstance();
+	bool m_leftMBDown = false;
+	glm::vec2 m_leftMouseDownPos{ 0.0 };
+	glm::vec2 m_leftMouseUpPos{ 0.0 };
+
 
 	//Game variables
 	unsigned int m_gameScore = 0;

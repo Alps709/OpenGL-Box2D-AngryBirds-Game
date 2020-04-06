@@ -79,6 +79,11 @@ void InputManager::Update()
 
 		 MouseState[0] =  INPUT_DOWN;
 	}
+	if (MouseState[1] == INPUT_DOWN_FIRST)
+	{	//Right click
+
+		MouseState[1] = INPUT_DOWN;
+	}
 	if ( MouseState[2] ==  INPUT_DOWN_FIRST)
 	{	//Right click
 

@@ -1,10 +1,7 @@
 #include "GameManager.h"
 #include "Input.h"
 #include "Obj.h"
-
 #include <fmod.h>
-
-
 
 GameManager::GameManager()
 {
@@ -31,13 +28,8 @@ GameManager::GameManager()
 	m_backgroundObject.SetTexture0(m_backgroundTexture);
 
 	//Create the text objects
-	//m_boidStateText = new TextLabel("Behaviour: Seek", "Resources/Fonts/arial.ttf", glm::vec2(-_inputManager.HSCREEN_HEIGHT + 20.0f, _inputManager.HSCREEN_HEIGHT - 40.0f));
-	//m_containmentStateText = new TextLabel("Containment: Off", "Resources/Fonts/arial.ttf", glm::vec2(-_inputManager.HSCREEN_HEIGHT + 20.0f, _inputManager.HSCREEN_HEIGHT - 80.0f));
 	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/Arial.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
-
-	//Create original boid
-	//m_boids.push_back(MakeBoid());
 
 	//Create the camera
 	//Pass in false to say it is not using an orthographic view initially (it will then use a perspective view projection)
@@ -49,17 +41,17 @@ GameManager::GameManager()
 	// Make the screen borders
 	CreateScreenBorders();
 	
-
-	for (int i = 0; i < 5; i++)
+	//Create physics objects
+	for (int i = 0; i < 10; i++)
 	{
-		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, 500.0f * i), glm::vec2(100.0f, 100.0f), 10.0f);
+		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, 250.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
 		m_physicsBoxes.push_back(tempBox);
-
-		PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-200.0f + i, 500.0f * i), 50.0f, 100.0f);
-		tempCircle.SetTexture0(m_circleTexture);
-		m_physicsCircles.push_back(tempCircle);
 	}
+
+	PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 50.0f, 100.0f);
+	tempCircle.SetTexture0(m_circleTexture);
+	m_physicsCircles.push_back(tempCircle);
 }
 
 GameManager::~GameManager()
@@ -156,6 +148,44 @@ void GameManager::ProcessInput()
 			GLCall(glPolygonMode(GL_FRONT, GL_FILL));
 		}
 	}
+
+	//Handle mouse input
+	//Left mouse button is pressed
+	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST)
+	{
+		m_leftMBDown = true;
+		m_leftMouseDownPos = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
+
+		//Debug logging
+		//std::cout << "Mouse button 1 was clicked!" << std::endl;
+		//std::cout << "Left mouse button start click pos: " << m_leftMouseDownPos.x << ", " << m_leftMouseDownPos.y << std::endl;
+	}
+	if (inputManager.MouseState[0] == INPUT_UP_FIRST)
+	{
+		m_leftMBDown = false;
+		m_leftMouseUpPos = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
+
+		//Debug logging
+		//std::cout << "Mouse button 1 was unclicked!" << std::endl;
+		//std::cout << "Left mouse button end click pos: " << m_leftMouseUpPos.x << ", " << m_leftMouseUpPos.y << std::endl;
+	}
+}
+
+void GameManager::CheckMouseCollisions()
+{
+	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST)
+	{
+		for (auto& pCircle : m_physicsCircles)
+		{
+			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle.GetBody()->GetPosition());
+			float circleRadius = pCircle.GetRadius();
+
+			if (float(glm::distance(circlePos, m_leftMouseDownPos) - circleRadius) < 0.0f)
+			{
+				std::cout << "Colliding with angry boid!" << std::endl;
+			}
+		}
+	}
 }
 
 void GameManager::Update(int _mousePosX, int _mousePosY)
@@ -163,6 +193,7 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 	//Update clock
 	m_clock.Process();
 	ProcessInput();
+	CheckMouseCollisions();
 
 	if (m_gameState == GAME_PLAY)
 	{
