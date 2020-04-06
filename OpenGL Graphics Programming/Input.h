@@ -24,8 +24,8 @@ namespace
 	void MouseClick(int _button, int _state, int _x, int _y)
 	{
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
-		_x -= (int)(inputManagerI.HSCREEN_WIDTH);
-		_y -= (int)(inputManagerI.HSCREEN_HEIGHT);
+		_x = (int)(Math::remap(_x, -inputManagerI.TRUE_HSCREEN_WIDTH, inputManagerI.TRUE_HSCREEN_WIDTH, -inputManagerI.HSCREEN_WIDTH, inputManagerI.HSCREEN_WIDTH) - inputManagerI.HSCREEN_WIDTH);
+		_y = (int)(Math::remap(_y, -inputManagerI.TRUE_HSCREEN_HEIGHT, inputManagerI.TRUE_HSCREEN_HEIGHT, -inputManagerI.HSCREEN_HEIGHT, inputManagerI.HSCREEN_HEIGHT) - inputManagerI.HSCREEN_HEIGHT);
 
 		//Invert y axis
 		_y *= -1;
