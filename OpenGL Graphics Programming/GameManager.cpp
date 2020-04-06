@@ -49,13 +49,13 @@ GameManager::GameManager()
 	//Create 10 boxes in the level
 	for (int i = 0; i < 10; i++)
 	{
-		PhysicsBox* tempBox = new PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
+		std::shared_ptr<PhysicsBox> tempBox = std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
 		tempBox->SetTexture0(m_backgroundTexture);
 		m_physicsBoxes.push_back(tempBox);
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	PhysicsCircle* tempCircle = new PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
+	std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
 	tempCircle->SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
 }
@@ -65,19 +65,8 @@ GameManager::~GameManager()
 	//Delete all the heap allocated objects and clean up others
 	//Clear the entities in the level
 	m_selectedBoid = nullptr;
-	for (auto box : m_physicsBoxes)
-	{
-		delete box;
-	}
-
-	for (auto boid : m_physicsCircles)
-	{
-		delete boid;
-	}
-
 	m_physicsBoxes.clear();
 	m_physicsCircles.clear();
-
 
 	delete m_menuTitleText;
 	delete m_menuInstructText;
@@ -224,7 +213,7 @@ void GameManager::CheckMouseCollisions()
 				std::cout << "Colliding with angry boid!" << std::endl;
 
 				//Set the currently selected boid to the angry boid
-				m_selectedBoid = angryBoid;
+				m_selectedBoid = angryBoid.get();
 				b2Body* angryBoidBody = angryBoid->GetBody();
 				
 				//Create the mouse joint
@@ -359,16 +348,6 @@ void GameManager::Reset()
 {
 	//Clear the entities in the level
 	m_selectedBoid = nullptr;
-	for (auto box : m_physicsBoxes)
-	{
-		delete box;
-	}
-
-	for (auto boid : m_physicsCircles)
-	{
-		delete boid;
-	}
-
 	m_physicsBoxes.clear();
 	m_physicsCircles.clear();
 	
@@ -377,13 +356,13 @@ void GameManager::Reset()
 	//Create 10 boxes in the level
 	for (int i = 0; i < 10; i++)
 	{
-		PhysicsBox* tempBox = new PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
+		std::shared_ptr<PhysicsBox> tempBox = std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
 		tempBox->SetTexture0(m_backgroundTexture);
 		m_physicsBoxes.push_back(tempBox);
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	PhysicsCircle* tempCircle = new PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
+	std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
 	tempCircle->SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
 }
