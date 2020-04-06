@@ -23,8 +23,8 @@ PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _r
 	fixtureDef.friction = 0.3f;
 	m_fixture = m_body->CreateFixture(&fixtureDef);
 
-	m_mesh = new Mesh(Objects::verticesBox, Objects::indicesBox);
-	m_shader = new Shader();
+	m_mesh = Mesh(Objects::verticesBox, Objects::indicesBox);
+	m_shader = Shader();
 }
 
 PhysicsCircle::~PhysicsCircle()

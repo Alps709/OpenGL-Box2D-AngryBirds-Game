@@ -17,13 +17,13 @@ GLuint ShaderLoader::CreateProgram(const char* vertexShaderFilename, const char*
 
 	glLinkProgram(program);
 
-	const auto shader = m_shaderMap->find(program);
+	/*const auto shader = m_shaderMap->find(program);
 
 	if (shader != m_shaderMap->end() && shader->second == ID)
 	{
 		std::cout << "Shader has already been compiled before!" << std::endl;
 		return shader->first;
-	}
+	}*/
 
 	// Check for link errors
 	int link_result = 0;
@@ -34,7 +34,7 @@ GLuint ShaderLoader::CreateProgram(const char* vertexShaderFilename, const char*
 		PrintErrorDetails(false, program, programName.c_str());
 		return 0;
 	}
-	m_shaderMap->insert(std::pair<GLuint, std::string>(program, ID));
+	//m_shaderMap->insert(std::pair<GLuint, std::string>(program, ID));
 	return program;
 }
 

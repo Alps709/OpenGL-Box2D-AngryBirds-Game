@@ -12,11 +12,11 @@ GameManager::GameManager()
 	//AudioInitialise();
 
 	//Create defaut shader
-	m_defaultShader = new Shader();
+	m_defaultShader = Shader();
 
 
 	//Set background mesh and texture
-	m_backgroundMesh = new Mesh(Objects::verticesBackground, Objects::indicesBackground);
+	m_backgroundMesh = Mesh(Objects::verticesBackground, Objects::indicesBackground);
 	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
 
 	//Texture for the main angry boid
@@ -32,7 +32,7 @@ GameManager::GameManager()
 
 	//Create the camera
 	//Pass in true to say it is using an orthographic view
-	m_camera = new Camera(true);
+	m_camera = std::make_unique <Camera>(true);
 
 	//Box 2D stuff
 
@@ -63,16 +63,11 @@ GameManager::GameManager()
 GameManager::~GameManager()
 {
 	//Delete all the heap allocated objects and clean up others
-	m_yeatSound->release();
-	m_audioSystem->release();
-	delete m_containmentStateText;
+	m_selectedBoid = nullptr;
 	delete m_menuTitleText;
 	delete m_menuInstructText;
-	delete m_backgroundMesh;
-	delete m_backgroundTexture;
 	delete m_angryBoidTexture;
-	delete m_defaultShader;
-	delete m_camera;
+	delete m_backgroundTexture;
 }
 
 //Disable the audio for now
@@ -296,9 +291,6 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 	//Update sounds
 	//m_audioSystem->update();
-
-	//Update key states with new input
-	inputManager.Update();
 
 	//Tell glut to call the render function again
 	glutPostRedisplay();

@@ -4,7 +4,13 @@
 
 void InputManager::Update()
 {
-
+	if (KeyState['r'] == INPUT_DOWN_FIRST ||
+		KeyState['R'] == INPUT_DOWN_FIRST)
+	{
+		//The key is has now been processed for a frame, so set it to the appropriate state
+		KeyState['r'] = INPUT_DOWN;
+		KeyState['R'] = INPUT_DOWN;
+	}
 	if (KeyState['p'] == INPUT_DOWN_FIRST ||
 		KeyState['P'] == INPUT_DOWN_FIRST)
 	{

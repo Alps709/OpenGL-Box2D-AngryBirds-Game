@@ -30,7 +30,7 @@ void Shader::CleanUp() const
 {
 	Unbind();
 	glDeleteProgram(m_programID);
-	m_shaderMap->erase(m_programID);
+	//m_shaderMap->erase(m_programID);
 }
 
 void Shader::SetUniform1f(const std::string& _name, float _v1) const

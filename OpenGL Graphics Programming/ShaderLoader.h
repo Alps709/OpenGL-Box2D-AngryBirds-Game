@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 
-static std::unique_ptr<std::map<GLuint, std::string>> m_shaderMap = std::make_unique<std::map <GLuint, std::string>>();
+//static std::unique_ptr<std::map<GLuint, std::string>> m_shaderMap = std::make_unique<std::map <GLuint, std::string>>();
 
 class ShaderLoader
 {

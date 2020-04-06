@@ -44,14 +44,11 @@ public:
 	void Render();
 	void Clear();
 
-	TextLabel* m_boidStateText = nullptr;
-	TextLabel* m_containmentStateText = nullptr;
-
-	inline static GameState m_gameState = GAME_MENU;
-	inline static GameplayState m_gameplayState = PLAY_SEEK;
+	GameState m_gameState = GAME_MENU;
 
 private:
 	InputManager& inputManager = InputManager::getInstance();
+
 	bool m_leftMBDown = false;
 	glm::vec2 m_leftMouseDownPos{ 0.0 };
 	glm::vec2 m_leftMouseUpPos{ 0.0 };
@@ -65,7 +62,7 @@ private:
 	double m_pillSpawnTimer = 0.0;
 
 	//Camera
-	Camera* m_camera = nullptr;
+	std::unique_ptr<Camera> m_camera;
 
 	//Box 2D stuff
 	std::unique_ptr<b2World> m_World;
@@ -82,28 +79,28 @@ private:
 	//Box 2D Physics Objects
 	std::vector<PhysicsBox> m_physicsBoxes;
 	std::vector<PhysicsCircle> m_physicsCircles;
-	PhysicsCircle* m_selectedBoid;
+	PhysicsCircle* m_selectedBoid = nullptr;
 
 	//Game Background
 	Object m_backgroundObject;
-	Mesh* m_backgroundMesh = nullptr;
-	Texture* m_backgroundTexture = nullptr;
+	Mesh m_backgroundMesh;
+	Texture* m_backgroundTexture;
 
 	//Circle Texture
-	Texture* m_angryBoidTexture = nullptr;
+	Texture* m_angryBoidTexture;
 
 	//Default shader
-	Shader* m_defaultShader = nullptr;
+	Shader m_defaultShader;
 
 	//Text
 	TextLabel* m_menuTitleText = nullptr;
 	TextLabel* m_menuInstructText = nullptr;
 	
 	//Audio
-	inline static FMOD::System* m_audioSystem = nullptr;
-	inline static FMOD::Sound* m_yeatSound = nullptr;
-	inline static FMOD::Sound* m_shoopSound = nullptr;
-	inline static FMOD::Sound* m_trackBackground = nullptr;
+	//inline static FMOD::System* m_audioSystem = nullptr;
+	//inline static FMOD::Sound* m_yeatSound = nullptr;
+	//inline static FMOD::Sound* m_shoopSound = nullptr;
+	//inline static FMOD::Sound* m_trackBackground = nullptr;
 
 	//Uniforms
 	GLfloat u_currentTime = 0;

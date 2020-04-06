@@ -3,7 +3,7 @@
 #include "Object.h"
 #include "Camera.h"
 
-Object::Object(Mesh* _mesh, Shader* _shader, glm::vec2 _position)
+Object::Object(Mesh _mesh, Shader _shader, glm::vec2 _position)
 {
 	m_mesh = _mesh;
 	m_shader = _shader;
@@ -75,8 +75,8 @@ void Object::Render(Camera& _myCamera)
 	glm::mat4 projViewMat = _myCamera.GetProjView();
 
 	//Bind the mesh that all the models will use
-	m_mesh->Bind();
-	m_shader->Bind();
+	m_mesh.Bind();
+	m_shader.Bind();
 
 	glm::mat4 pvmMat = projViewMat * m_modelMat;
 
@@ -84,10 +84,10 @@ void Object::Render(Camera& _myCamera)
 	BindTexture(0);
 
 	//Set object specific uniforms
-	m_shader->SetUniformMat4f("u_PVM", pvmMat);
+	m_shader.SetUniformMat4f("u_PVM", pvmMat);
 
 	//Draw the object
-	GLCall(glDrawElements(GL_TRIANGLES, m_mesh->GetindicesCount(), GL_UNSIGNED_INT, static_cast<void *>(0)));
+	GLCall(glDrawElements(GL_TRIANGLES, m_mesh.GetindicesCount(), GL_UNSIGNED_INT, static_cast<void *>(0)));
 
 	Mesh::Unbind();
 	Shader::Unbind();

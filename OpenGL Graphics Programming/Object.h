@@ -11,7 +11,7 @@ class  Object
 {
 public:
 	Object() = default;
-	Object(Mesh* _mesh, Shader* _shader, glm::vec2 _position);
+	Object(Mesh _mesh, Shader _shader, glm::vec2 _position);
 	virtual ~Object();
 
 	//Getters
@@ -23,7 +23,7 @@ public:
 	/*void SetTexture1(Texture* _tex);*/
 
 	//Getters
-	Mesh* GetMesh() const { return m_mesh; }
+	Mesh GetMesh() const { return m_mesh; }
 	glm::mat4 GetModelMat() const { return m_modelMat; }
 	virtual double GetRadius() const { return m_colliderRadius; };
 
@@ -47,9 +47,9 @@ protected:
 
 	glm::mat4 m_modelMat = glm::mat4(1.0f);
 
-	Mesh* m_mesh;
-	Shader* m_shader;
-	Texture* m_tex0{};
+	Mesh m_mesh;
+	Shader m_shader;
+	Texture* m_tex0;
 	//Texture* m_tex1{};
 };
 
