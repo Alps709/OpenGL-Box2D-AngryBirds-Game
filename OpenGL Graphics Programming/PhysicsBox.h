@@ -22,7 +22,7 @@ public:
 	glm::vec2 GetSize(){ return m_size; }
 
 protected:
-
+	b2World* m_world = nullptr;
 	b2Body* m_body = nullptr;
 	b2Fixture* m_fixture = nullptr;
 	glm::vec2 m_position{ 0.0f, 0.0f };

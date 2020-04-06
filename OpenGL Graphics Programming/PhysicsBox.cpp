@@ -4,13 +4,14 @@
 PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size, float density)
 {
 	m_size = size;
+	m_world = world;
 
 	// Make the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
 	const auto tempPos = Math::Vec2toBox2D(position);
 	bodyDef.position.Set(tempPos.x, tempPos.y);
-	m_body = world->CreateBody(&bodyDef);
+	m_body = m_world->CreateBody(&bodyDef);
 
 	const auto tempShape = Math::Vec2toBox2D(size);
 	b2PolygonShape boxShape;
@@ -28,4 +29,5 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 
 PhysicsBox::~PhysicsBox()
 {
+	m_world->DestroyBody(m_body);
 }

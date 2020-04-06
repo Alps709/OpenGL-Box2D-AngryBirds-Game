@@ -49,21 +49,36 @@ GameManager::GameManager()
 	//Create 10 boxes in the level
 	for (int i = 0; i < 10; i++)
 	{
-		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
-		tempBox.SetTexture0(m_backgroundTexture);
+		PhysicsBox* tempBox = new PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
+		tempBox->SetTexture0(m_backgroundTexture);
 		m_physicsBoxes.push_back(tempBox);
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
-	tempCircle.SetTexture0(m_angryBoidTexture);
+	PhysicsCircle* tempCircle = new PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
+	tempCircle->SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
 }
 
 GameManager::~GameManager()
 {
 	//Delete all the heap allocated objects and clean up others
+	//Clear the entities in the level
 	m_selectedBoid = nullptr;
+	for (auto box : m_physicsBoxes)
+	{
+		delete box;
+	}
+
+	for (auto boid : m_physicsCircles)
+	{
+		delete boid;
+	}
+
+	m_physicsBoxes.clear();
+	m_physicsCircles.clear();
+
+
 	delete m_menuTitleText;
 	delete m_menuInstructText;
 	delete m_angryBoidTexture;
@@ -178,6 +193,17 @@ void GameManager::ProcessInput()
 		//std::cout << "Mouse button 1 was unclicked!" << std::endl;
 		//std::cout << "Left mouse button end click pos: " << m_leftMouseUpPos.x << ", " << m_leftMouseUpPos.y << std::endl;
 	}
+
+	if (inputManager.KeyState['r'] == INPUT_DOWN_FIRST)
+	{
+		Reset();
+
+		if (m_mouseJoint)
+		{
+			m_World->DestroyJoint(m_mouseJoint);
+			m_mouseJoint = nullptr;
+		}
+	}
 }
 
 void GameManager::CheckMouseCollisions()
@@ -188,8 +214,8 @@ void GameManager::CheckMouseCollisions()
 		for (auto& angryBoid : m_physicsCircles)
 		{
 			//Get the position of the angry boid
-			glm::vec2 angryBoidPos = Math::Box2DtoVec2(angryBoid.GetBody()->GetPosition());
-			float angryBoidRadius = angryBoid.GetRadius();
+			glm::vec2 angryBoidPos = Math::Box2DtoVec2(angryBoid->GetBody()->GetPosition());
+			float angryBoidRadius = angryBoid->GetRadius();
 
 			//Check if the mouse is colliding with the angry boid
 			if (float(glm::distance(angryBoidPos, m_leftMouseDownPos) - angryBoidRadius) < 0.0f)
@@ -198,8 +224,8 @@ void GameManager::CheckMouseCollisions()
 				std::cout << "Colliding with angry boid!" << std::endl;
 
 				//Set the currently selected boid to the angry boid
-				m_selectedBoid = &angryBoid;
-				b2Body* angryBoidBody = angryBoid.GetBody();
+				m_selectedBoid = angryBoid;
+				b2Body* angryBoidBody = angryBoid->GetBody();
 				
 				//Create the mouse joint
 				b2MouseJointDef md;
@@ -273,16 +299,16 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 	{
 		for (auto& pBox : m_physicsBoxes)
 		{
-			glm::vec2 boxPos = Math::Box2DtoVec2(pBox.GetBody()->GetPosition());
-		    glm::vec2 boxSize = pBox.GetSize();
-			pBox.SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox.GetBody()->GetAngle()), boxSize.x, boxSize.y);
+			glm::vec2 boxPos = Math::Box2DtoVec2(pBox->GetBody()->GetPosition());
+		    glm::vec2 boxSize = pBox->GetSize();
+			pBox->SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox->GetBody()->GetAngle()), boxSize.x, boxSize.y);
 		}
 
 		for (auto& pCircle : m_physicsCircles)
 		{
-			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle.GetBody()->GetPosition());
-			float circleRadius = pCircle.GetRadius();
-			pCircle.SetPRS(circlePos.x, circlePos.y, glm::degrees(pCircle.GetBody()->GetAngle()), circleRadius * 2.0f, circleRadius * 2.0f);
+			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle->GetBody()->GetPosition());
+			float circleRadius = pCircle->GetRadius();
+			pCircle->SetPRS(circlePos.x, circlePos.y, glm::degrees(pCircle->GetBody()->GetAngle()), circleRadius * 2.0f, circleRadius * 2.0f);
 		}
 
 		//Update physics simulation only during play
@@ -301,9 +327,6 @@ void GameManager::Render()
 	//Clear the screen before every frame
 	Clear();
 
-	//Draw background
-	//m_backgroundObject.Render(*m_camera);
-
 	if (m_gameState == GAME_MENU)
 	{
 		m_menuTitleText->Render();
@@ -311,18 +334,15 @@ void GameManager::Render()
 	}
 	else if (m_gameState == GAME_PLAY)
 	{
-		for (PhysicsBox& pBox : m_physicsBoxes)
+		for (auto& pBox : m_physicsBoxes)
 		{
-			pBox.Render(*m_camera);
+			pBox->Render(*m_camera);
 		}
 
-		for (PhysicsCircle& pCircle : m_physicsCircles)
+		for (auto& pCircle : m_physicsCircles)
 		{
-			pCircle.Render(*m_camera);
+			pCircle->Render(*m_camera);
 		}
-
-		//m_boidStateText->Render();
-		//m_containmentStateText->Render();
 	}
 
 	glutSwapBuffers();
@@ -333,6 +353,39 @@ void GameManager::Clear()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+}
+
+void GameManager::Reset()
+{
+	//Clear the entities in the level
+	m_selectedBoid = nullptr;
+	for (auto box : m_physicsBoxes)
+	{
+		delete box;
+	}
+
+	for (auto boid : m_physicsCircles)
+	{
+		delete boid;
+	}
+
+	m_physicsBoxes.clear();
+	m_physicsCircles.clear();
+	
+	//Recreate the entities in the level
+
+	//Create 10 boxes in the level
+	for (int i = 0; i < 10; i++)
+	{
+		PhysicsBox* tempBox = new PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
+		tempBox->SetTexture0(m_backgroundTexture);
+		m_physicsBoxes.push_back(tempBox);
+	}
+
+	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+	PhysicsCircle* tempCircle = new PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
+	tempCircle->SetTexture0(m_angryBoidTexture);
+	m_physicsCircles.push_back(tempCircle);
 }
 
 void GameManager::CreateScreenBorderWalls()

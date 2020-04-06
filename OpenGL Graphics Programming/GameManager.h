@@ -44,6 +44,8 @@ public:
 	void Render();
 	void Clear();
 
+	void Reset();
+
 	GameState m_gameState = GAME_MENU;
 
 private:
@@ -77,8 +79,8 @@ private:
 	///Objects
 
 	//Box 2D Physics Objects
-	std::vector<PhysicsBox> m_physicsBoxes;
-	std::vector<PhysicsCircle> m_physicsCircles;
+	std::vector<PhysicsBox*> m_physicsBoxes;
+	std::vector<PhysicsCircle*> m_physicsCircles;
 	PhysicsCircle* m_selectedBoid = nullptr;
 
 	//Game Background
