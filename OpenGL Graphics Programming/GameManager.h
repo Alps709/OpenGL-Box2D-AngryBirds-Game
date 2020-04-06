@@ -71,11 +71,18 @@ private:
 	std::unique_ptr<b2World> m_World;
 	b2Vec2 m_gravity = { 0.0, -1.0 };
 
+	//Used for moving the angry boid
+	b2MouseJoint* m_mouseJoint = nullptr;
+	//Base ground body used to attach the mouse joint to the world
+	b2Body* m_groundBody = nullptr;
+
+
 	///Objects
 
 	//Box 2D Physics Objects
 	std::vector<PhysicsBox> m_physicsBoxes;
 	std::vector<PhysicsCircle> m_physicsCircles;
+	PhysicsCircle* m_selectedBoid;
 
 	//Game Background
 	Object m_backgroundObject;
@@ -83,7 +90,7 @@ private:
 	Texture* m_backgroundTexture = nullptr;
 
 	//Circle Texture
-	Texture* m_circleTexture = nullptr;
+	Texture* m_angryBoidTexture = nullptr;
 
 	//Default shader
 	Shader* m_defaultShader = nullptr;

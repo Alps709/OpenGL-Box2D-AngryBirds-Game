@@ -21,7 +21,7 @@ GameManager::GameManager()
 	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
 
 	//Circle texture
-	m_circleTexture = new Texture("Resources/Images/Circle.png", 0);
+	m_angryBoidTexture = new Texture("Resources/Images/Circle.png", 0);
 
 	//Create 1 background object
 	m_backgroundObject = Object(m_backgroundMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
@@ -38,10 +38,14 @@ GameManager::GameManager()
 	//Box 2D stuff
 	m_World = std::make_unique<b2World>(m_gravity);
 
+	//Make the ground body used the mousejoint
+	b2BodyDef bodyDef;
+	m_groundBody = m_World->CreateBody(&bodyDef);
+
 	// Make the screen borders
 	CreateScreenBorders();
 	
-	//Create physics objects
+	//Create 10 boxes in the level
 	for (int i = 0; i < 10; i++)
 	{
 		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
@@ -49,8 +53,9 @@ GameManager::GameManager()
 		m_physicsBoxes.push_back(tempBox);
 	}
 
-	PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 50.0f, 100.0f);
-	tempCircle.SetTexture0(m_circleTexture);
+	//Create the angry boid
+	PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 10.0f);
+	tempCircle.SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
 }
 
@@ -160,6 +165,7 @@ void GameManager::ProcessInput()
 		//std::cout << "Mouse button 1 was clicked!" << std::endl;
 		//std::cout << "Left mouse button start click pos: " << m_leftMouseDownPos.x << ", " << m_leftMouseDownPos.y << std::endl;
 	}
+	//Left mouse button is released
 	if (inputManager.MouseState[0] == INPUT_UP_FIRST)
 	{
 		m_leftMBDown = false;
@@ -180,13 +186,51 @@ void GameManager::CheckMouseCollisions()
 			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle.GetBody()->GetPosition());
 			float circleRadius = pCircle.GetRadius();
 
+			//Check if the mouse is colliding with the angry boid
 			if (float(glm::distance(circlePos, m_leftMouseDownPos) - circleRadius) < 0.0f)
 			{
+				m_selectedBoid = &pCircle;
+				b2Body* circleBody = pCircle.GetBody();
 				std::cout << "Colliding with angry boid!" << std::endl;
-				pCircle.GetBody()->ApplyForce(b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f), true);
-				pCircle.GetBody()->SetGravityScale(1.0f);
+				/*pCircle.GetBody()->ApplyForce(b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f), true);
+				pCircle.GetBody()->SetGravityScale(1.0f);*/
+
+				//Create the mouse joint
+				b2MouseJointDef md;
+				md.bodyA = m_groundBody;
+				md.bodyB = circleBody;
+				md.target = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
+				md.maxForce = 1000.0f * circleBody->GetMass();
+				m_mouseJoint = (b2MouseJoint*)m_World->CreateJoint(&md);
+				circleBody->SetAwake(true);
 			}
 		}
+	}
+
+	//If the mouse has been released and the mouse joint exists
+	if (m_leftMBDown && m_mouseJoint)
+	{
+		b2Vec2 newPos = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
+		m_mouseJoint->SetTarget(newPos);
+	}
+
+	//If the mouse has been released and the mouse joint exists
+	if (!m_leftMBDown && m_mouseJoint)
+	{
+		m_World->DestroyJoint(m_mouseJoint);
+		m_mouseJoint = nullptr;
+
+		//Make the angry boid get shot towards where it was first clicked on
+		b2Body* boidBody = m_selectedBoid->GetBody();
+
+		//Calculate the force vector
+		glm::vec2 forceVec = m_leftMouseDownPos - m_leftMouseUpPos;
+		forceVec = glm::normalize(forceVec) * boidBody->GetMass() * 25000.0f;
+
+		boidBody->ApplyForce(Math::Vec2toBox2D(forceVec), boidBody->GetPosition(), true);
+		boidBody->SetGravityScale(1.0f);
+
+		m_selectedBoid = nullptr;
 	}
 
 	//Test physics
