@@ -28,7 +28,6 @@ protected:
 	glm::vec2 m_position{ 0.0f, 0.0f };
 	float m_rotationZ = 0.0f;
 	float m_radius = 1.0f;
-	double m_colliderRadius = 10.0f;
 };
 
 

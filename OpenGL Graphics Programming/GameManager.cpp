@@ -44,7 +44,7 @@ GameManager::GameManager()
 	//Create physics objects
 	for (int i = 0; i < 10; i++)
 	{
-		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, 250.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
+		PhysicsBox tempBox = PhysicsBox(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
 		tempBox.SetTexture0(m_backgroundTexture);
 		m_physicsBoxes.push_back(tempBox);
 	}
@@ -183,9 +183,26 @@ void GameManager::CheckMouseCollisions()
 			if (float(glm::distance(circlePos, m_leftMouseDownPos) - circleRadius) < 0.0f)
 			{
 				std::cout << "Colliding with angry boid!" << std::endl;
+				pCircle.GetBody()->ApplyForce(b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f), true);
+				pCircle.GetBody()->SetGravityScale(1.0f);
 			}
 		}
 	}
+
+	//Test physics
+	/*if (m_leftMBDown)
+	{
+		for (auto& pBox : m_physicsBoxes)
+		{
+			glm::vec2 mousePos = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
+			auto boxPos = Math::Box2DtoVec2(pBox.GetBody()->GetPosition());
+			glm::vec2 vecToMouseClick = mousePos - boxPos;
+
+			vecToMouseClick = glm::normalize(vecToMouseClick) * 1000.0f;
+			
+			pBox.GetBody()->ApplyForce(Math::Vec2toBox2D(vecToMouseClick), pBox.GetBody()->GetPosition(), true);
+		}
+	}*/
 }
 
 void GameManager::Update(int _mousePosX, int _mousePosY)
@@ -212,7 +229,7 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 		}
 
 		//Update physics simulation only during play
-		m_World->Step(1.0f / 60.0f, 6, 6);
+		m_World->Step(1.0f / 60.0f, 12, 12);
 	}
 
 	//Update sounds
@@ -267,33 +284,44 @@ void GameManager::Clear()
 void GameManager::CreateScreenBorders()
 {
 	//Ground border
-	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -inputManager.HSCREEN_HEIGHT));
+	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -inputManager.SCREEN_HEIGHT));
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(tempPos.x, tempPos.y);
 	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
 	// Make the ground fixture
-	auto tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_HEIGHT, 0.0f));
+	auto tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	b2PolygonShape groundBox;
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Left wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(-inputManager.HSCREEN_HEIGHT, 00.0f));
+	tempPos = Math::Vec2toBox2D(glm::vec2(-inputManager.SCREEN_WIDTH, 00.0f));
 	b2BodyDef leftWallBody;
 	leftWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&leftWallBody);
 	// Make the fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, inputManager.HSCREEN_HEIGHT));
+	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Right wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_HEIGHT, 00.0f));
+	tempPos = Math::Vec2toBox2D(glm::vec2(inputManager.SCREEN_WIDTH, 0.0f));
 	b2BodyDef rightWallBody;
 	rightWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&rightWallBody);
 	// Make the fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(0.0, inputManager.HSCREEN_HEIGHT));
+	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
+	groundBox.SetAsBox(tempSize.x, tempSize.y);
+	groundBody->CreateFixture(&groundBox, 0.0f);
+
+
+	//Ground border
+	tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, inputManager.SCREEN_HEIGHT));
+	b2BodyDef roofBodyDef;
+	roofBodyDef.position.Set(tempPos.x, tempPos.y);
+	groundBody = m_World->CreateBody(&roofBodyDef);
+	// Make the ground fixture
+	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 }
