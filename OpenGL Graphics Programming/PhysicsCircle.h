@@ -15,7 +15,7 @@ class PhysicsCircle : public Object
 public:
 	PhysicsCircle() = default;
 	PhysicsCircle(b2World* world, const glm::vec2& position, float _radius, float density = 1.0f);
-	~PhysicsCircle();
+	~PhysicsCircle() override;
 
 	//Getters
 	b2Body* GetBody() { return m_body; }

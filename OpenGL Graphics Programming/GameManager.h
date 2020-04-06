@@ -38,7 +38,7 @@ public:
 	void CheckMouseCollisions();
 
 	//Create the physical screen borders for the box 2d world
-	void CreateScreenBorders();
+	void CreateScreenBorderWalls();
 
 	void Update(int _mousePosX, int _mousePosY);
 	void Render();
@@ -71,7 +71,7 @@ private:
 	std::unique_ptr<b2World> m_World;
 	b2Vec2 m_gravity = { 0.0, -1.0 };
 
-	//Used for moving the angry boid
+	//Used for moving the angry boid when clicked on
 	b2MouseJoint* m_mouseJoint = nullptr;
 	//Base ground body used to attach the mouse joint to the world
 	b2Body* m_groundBody = nullptr;

@@ -14,14 +14,13 @@ GameManager::GameManager()
 	//Create defaut shader
 	m_defaultShader = new Shader();
 
-	//m_boidMesh = new Mesh(Objects::verticesBoid, Objects::indicesBoid);
 
 	//Set background mesh and texture
 	m_backgroundMesh = new Mesh(Objects::verticesBackground, Objects::indicesBackground);
 	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
 
-	//Circle texture
-	m_angryBoidTexture = new Texture("Resources/Images/Circle.png", 0);
+	//Texture for the main angry boid
+	m_angryBoidTexture = new Texture("Resources/Images/AngryBoid.png", 0);
 
 	//Create 1 background object
 	m_backgroundObject = Object(m_backgroundMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
@@ -32,18 +31,20 @@ GameManager::GameManager()
 	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/Arial.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 
 	//Create the camera
-	//Pass in false to say it is not using an orthographic view initially (it will then use a perspective view projection)
+	//Pass in true to say it is using an orthographic view
 	m_camera = new Camera(true);
 
 	//Box 2D stuff
+
+	//Create the world with the specified gravity
 	m_World = std::make_unique<b2World>(m_gravity);
 
-	//Make the ground body used the mousejoint
+	//Make the empty ground body used for the mousejoint
 	b2BodyDef bodyDef;
 	m_groundBody = m_World->CreateBody(&bodyDef);
 
 	// Make the screen borders
-	CreateScreenBorders();
+	CreateScreenBorderWalls();
 	
 	//Create 10 boxes in the level
 	for (int i = 0; i < 10; i++)
@@ -53,8 +54,8 @@ GameManager::GameManager()
 		m_physicsBoxes.push_back(tempBox);
 	}
 
-	//Create the angry boid
-	PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 10.0f);
+	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+	PhysicsCircle tempCircle = PhysicsCircle(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
 	tempCircle.SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
 }
@@ -64,16 +65,17 @@ GameManager::~GameManager()
 	//Delete all the heap allocated objects and clean up others
 	m_yeatSound->release();
 	m_audioSystem->release();
-	//delete m_boidStateText;
 	delete m_containmentStateText;
 	delete m_menuTitleText;
 	delete m_menuInstructText;
 	delete m_backgroundMesh;
 	delete m_backgroundTexture;
+	delete m_angryBoidTexture;
 	delete m_defaultShader;
 	delete m_camera;
 }
 
+//Disable the audio for now
 //void GameManager::AudioInitialise()
 //{
 //
@@ -122,7 +124,6 @@ GameManager::~GameManager()
 //		//	}
 //		//}
 //	}
-//
 //}
 
 void GameManager::ProcessInput()
@@ -158,17 +159,24 @@ void GameManager::ProcessInput()
 	//Left mouse button is pressed
 	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST)
 	{
+		//Update the mouse clicked state
 		m_leftMBDown = true;
+
+		//Save where it was clicked
 		m_leftMouseDownPos = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
 
 		//Debug logging
 		//std::cout << "Mouse button 1 was clicked!" << std::endl;
 		//std::cout << "Left mouse button start click pos: " << m_leftMouseDownPos.x << ", " << m_leftMouseDownPos.y << std::endl;
 	}
+
 	//Left mouse button is released
 	if (inputManager.MouseState[0] == INPUT_UP_FIRST)
 	{
+		//Update mouse unclicked state
 		m_leftMBDown = false;
+
+		//Save where it was let go
 		m_leftMouseUpPos = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
 
 		//Debug logging
@@ -179,37 +187,44 @@ void GameManager::ProcessInput()
 
 void GameManager::CheckMouseCollisions()
 {
+	//If the left mouse button was clicked on this frame
 	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST)
 	{
-		for (auto& pCircle : m_physicsCircles)
+		for (auto& angryBoid : m_physicsCircles)
 		{
-			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle.GetBody()->GetPosition());
-			float circleRadius = pCircle.GetRadius();
+			//Get the position of the angry boid
+			glm::vec2 angryBoidPos = Math::Box2DtoVec2(angryBoid.GetBody()->GetPosition());
+			float angryBoidRadius = angryBoid.GetRadius();
 
 			//Check if the mouse is colliding with the angry boid
-			if (float(glm::distance(circlePos, m_leftMouseDownPos) - circleRadius) < 0.0f)
+			if (float(glm::distance(angryBoidPos, m_leftMouseDownPos) - angryBoidRadius) < 0.0f)
 			{
-				m_selectedBoid = &pCircle;
-				b2Body* circleBody = pCircle.GetBody();
+				//The player clicked on the angry boid
 				std::cout << "Colliding with angry boid!" << std::endl;
-				/*pCircle.GetBody()->ApplyForce(b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f), true);
-				pCircle.GetBody()->SetGravityScale(1.0f);*/
 
+				//Set the currently selected boid to the angry boid
+				m_selectedBoid = &angryBoid;
+				b2Body* angryBoidBody = angryBoid.GetBody();
+				
 				//Create the mouse joint
 				b2MouseJointDef md;
 				md.bodyA = m_groundBody;
-				md.bodyB = circleBody;
+				md.bodyB = angryBoidBody;
+
+				//The target is where the mousejoint will move the angry boid
+				//Target is the mouse position
 				md.target = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
-				md.maxForce = 1000.0f * circleBody->GetMass();
+				md.maxForce = 1000.0f * angryBoidBody->GetMass();
 				m_mouseJoint = (b2MouseJoint*)m_World->CreateJoint(&md);
-				circleBody->SetAwake(true);
+				angryBoidBody->SetAwake(true);
 			}
 		}
 	}
 
-	//If the mouse has been released and the mouse joint exists
+	//If the mouse has been moved while the mouse joint exists
 	if (m_leftMBDown && m_mouseJoint)
 	{
+		//Update the target to the new mouse pos
 		b2Vec2 newPos = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
 		m_mouseJoint->SetTarget(newPos);
 	}
@@ -225,15 +240,16 @@ void GameManager::CheckMouseCollisions()
 
 		//Calculate the force vector
 		glm::vec2 forceVec = m_leftMouseDownPos - m_leftMouseUpPos;
-		forceVec = glm::normalize(forceVec) * boidBody->GetMass() * 25000.0f;
+		forceVec = glm::normalize(forceVec) * boidBody->GetMass() * 20000.0f;
 
+		//Apply the force to the angry boid so that it gets flung when the mouse is let go
 		boidBody->ApplyForce(Math::Vec2toBox2D(forceVec), boidBody->GetPosition(), true);
 		boidBody->SetGravityScale(1.0f);
 
 		m_selectedBoid = nullptr;
 	}
 
-	//Test physics
+	//Test physics - uncommenting this will allow you to have the boxes fly towards the mouse
 	/*if (m_leftMBDown)
 	{
 		for (auto& pBox : m_physicsBoxes)
@@ -254,6 +270,8 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 	//Update clock
 	m_clock.Process();
 	ProcessInput();
+
+	//Checks for collision of mouse click with collision of the angry boid
 	CheckMouseCollisions();
 
 	if (m_gameState == GAME_PLAY)
@@ -325,7 +343,7 @@ void GameManager::Clear()
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
-void GameManager::CreateScreenBorders()
+void GameManager::CreateScreenBorderWalls()
 {
 	//Ground border
 	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -inputManager.SCREEN_HEIGHT));

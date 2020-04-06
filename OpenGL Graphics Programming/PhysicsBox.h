@@ -15,7 +15,7 @@ class PhysicsBox: public Object
 public:
 	PhysicsBox() = default;
 	PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size, float density = 1.0f);
-	~PhysicsBox();
+	~PhysicsBox() override;
 
 	//Getters
 	b2Body* GetBody(){ return m_body; }
