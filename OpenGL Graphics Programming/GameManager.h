@@ -6,6 +6,7 @@
 #include "clock.h"
 #include "PhysicsBox.h"
 #include "PhysicsCircle.h"
+#include "PhysicsSeesaw.h"
 #include <box2d.h>
 
 #include <fmod.hpp>
@@ -72,13 +73,18 @@ private:
 
 	//Used for moving the angry boid when clicked on
 	b2MouseJoint* m_mouseJoint = nullptr;
+
 	//Base ground body used to attach the mouse joint to the world
 	b2Body* m_groundBody = nullptr;
+	
+	//Seesaw joint
+	b2RevoluteJoint* m_seesawJoint = nullptr;
 
 
 	///Objects
 
 	//Box 2D Physics Objects
+	std::shared_ptr <PhysicsSeesaw> m_physicsSeesaw;
 	std::vector<std::shared_ptr<PhysicsBox>> m_physicsBoxes;
 	std::vector< std::shared_ptr<PhysicsCircle>> m_physicsCircles;
 	PhysicsCircle* m_selectedBoid = nullptr;

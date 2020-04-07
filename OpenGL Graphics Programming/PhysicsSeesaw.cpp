@@ -1,7 +1,7 @@
-#include "PhysicsBox.h"
+#include "PhysicsSeesaw.h"
 #include "Obj.h"
 
-PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size, float density)
+PhysicsSeesaw::PhysicsSeesaw(b2World* world, const glm::vec2& position, const glm::vec2& size, float density)
 {
 	m_size = size;
 	m_world = world;
@@ -23,11 +23,22 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 	fixtureDef.friction = 0.3f;
 	m_fixture = m_body->CreateFixture(&fixtureDef);
 
+	b2BodyDef groundbodyDef;
+	groundbodyDef.position.Set(tempPos.x, tempPos.y);
+	m_groundBody = world->CreateBody(&groundbodyDef);
+
+	b2RevoluteJointDef revoluteJointDef;
+	revoluteJointDef.bodyA = m_groundBody;
+	revoluteJointDef.bodyB = m_body;
+	revoluteJointDef.collideConnected = false;
+
+	m_seesawJoint = (b2RevoluteJoint*)world->CreateJoint(&revoluteJointDef);
+
 	m_mesh = Mesh(Objects::verticesBox, Objects::indicesBox);
 	m_shader = Shader();
 }
 
-PhysicsBox::~PhysicsBox()
+PhysicsSeesaw::~PhysicsSeesaw()
 {
 	//m_world->DestroyBody(m_body);
 }

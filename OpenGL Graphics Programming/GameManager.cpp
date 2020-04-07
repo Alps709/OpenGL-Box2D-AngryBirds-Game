@@ -55,9 +55,13 @@ GameManager::GameManager()
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
+	std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-400.0f, -100.0f), 25.0f, 25.0f);
 	tempCircle->SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
+
+	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(350.0f, 0.0f), glm::vec2(200.0f, 10.0f), 10.0f);
+	m_physicsSeesaw->SetTexture0(m_backgroundTexture);
 }
 
 GameManager::~GameManager()
@@ -198,7 +202,7 @@ void GameManager::ProcessInput()
 void GameManager::CheckMouseCollisions()
 {
 	//If the left mouse button was clicked on this frame
-	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST)
+	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST && !m_mouseJoint)
 	{
 		for (auto& angryBoid : m_physicsCircles)
 		{
@@ -237,6 +241,19 @@ void GameManager::CheckMouseCollisions()
 		//Update the target to the new mouse pos
 		b2Vec2 newPos = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
 		m_mouseJoint->SetTarget(newPos);
+
+		glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
+		forceVec *= 2;
+
+		double point1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
+		double point2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
+		double point3 = Math::remap(forceVec.x, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
+		double point4 = Math::remap(forceVec.y, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
+
+		glBegin(GL_LINES);
+		glVertex2f((float)point1, (float)point2);
+		glVertex2f((float)point3, (float)point4);
+		glEnd();
 	}
 
 	//If the mouse has been released and the mouse joint exists
@@ -250,11 +267,14 @@ void GameManager::CheckMouseCollisions()
 
 		//Calculate the force vector
 		glm::vec2 forceVec = m_leftMouseDownPos - m_leftMouseUpPos;
-		forceVec = glm::normalize(forceVec) * boidBody->GetMass() * 20000.0f;
+		if (glm::length(forceVec) != 0)
+		{
+			forceVec *= boidBody->GetMass() * 100.0f;
 
-		//Apply the force to the angry boid so that it gets flung when the mouse is let go
-		boidBody->ApplyForce(Math::Vec2toBox2D(forceVec), boidBody->GetPosition(), true);
-		boidBody->SetGravityScale(1.0f);
+			//Apply the force to the angry boid so that it gets flung when the mouse is let go
+			boidBody->ApplyForce(Math::Vec2toBox2D(forceVec), boidBody->GetPosition(), true);
+			boidBody->SetGravityScale(1.0f);
+		}
 
 		m_selectedBoid = nullptr;
 	}
@@ -286,6 +306,10 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 	if (m_gameState == GAME_PLAY)
 	{
+		glm::vec2 seesawPos = Math::Box2DtoVec2(m_physicsSeesaw->GetBody()->GetPosition());
+		glm::vec2 seesawSize = m_physicsSeesaw->GetSize();
+		m_physicsSeesaw->SetPRS(seesawPos.x, seesawPos.y, glm::degrees(m_physicsSeesaw->GetBody()->GetAngle()), seesawSize.x, seesawSize.y);
+
 		for (auto& pBox : m_physicsBoxes)
 		{
 			glm::vec2 boxPos = Math::Box2DtoVec2(pBox->GetBody()->GetPosition());
@@ -323,6 +347,9 @@ void GameManager::Render()
 	}
 	else if (m_gameState == GAME_PLAY)
 	{
+
+		m_physicsSeesaw->Render(*m_camera);
+
 		for (auto& pBox : m_physicsBoxes)
 		{
 			pBox->Render(*m_camera);
@@ -348,23 +375,23 @@ void GameManager::Reset()
 {
 	//Clear the entities in the level
 	m_selectedBoid = nullptr;
-	m_physicsBoxes.clear();
-	m_physicsCircles.clear();
-	
-	//Recreate the entities in the level
 
-	//Create 10 boxes in the level
-	for (int i = 0; i < 10; i++)
+	int i = 0;
+	for (auto& box : m_physicsBoxes)
 	{
-		std::shared_ptr<PhysicsBox> tempBox = std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
-		tempBox->SetTexture0(m_backgroundTexture);
-		m_physicsBoxes.push_back(tempBox);
+		box->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i)), 0.0f);
+		box->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		box->GetBody()->SetAngularVelocity(0.0f);
+		++i;
 	}
 
-	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-450.0f, -100.0f), 25.0f, 25.0f);
-	tempCircle->SetTexture0(m_angryBoidTexture);
-	m_physicsCircles.push_back(tempCircle);
+	for (auto& angryBoid : m_physicsCircles)
+	{
+		angryBoid->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(-400.0f, -100.0f)), 0.0f);
+		angryBoid->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		angryBoid->GetBody()->SetAngularVelocity(0.0f);
+		angryBoid->GetBody()->SetGravityScale(0.0f);
+	}
 }
 
 void GameManager::CreateScreenBorderWalls()

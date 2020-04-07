@@ -75,7 +75,7 @@ TextLabel::TextLabel(const std::string& _text, const std::string& _font, glm::ve
 
 TextLabel::~TextLabel()
 {
-	m_characters.erase(m_characters.begin(), m_characters.end());
+	m_characters.clear();
 }
 
 void TextLabel::Render()

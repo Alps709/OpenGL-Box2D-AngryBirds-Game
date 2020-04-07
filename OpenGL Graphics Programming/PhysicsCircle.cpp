@@ -30,5 +30,5 @@ PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _r
 
 PhysicsCircle::~PhysicsCircle()
 {
-	m_world->DestroyBody(m_body);
+	//m_world->DestroyBody(m_body);
 }

@@ -162,6 +162,7 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PhysicsBox.cpp" />
     <ClCompile Include="PhysicsCircle.cpp" />
+    <ClCompile Include="PhysicsSeesaw.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="TextLabel.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Obj.h" />
     <ClInclude Include="PhysicsBox.h" />
     <ClInclude Include="PhysicsCircle.h" />
+    <ClInclude Include="PhysicsSeesaw.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="TextLabel.h" />
