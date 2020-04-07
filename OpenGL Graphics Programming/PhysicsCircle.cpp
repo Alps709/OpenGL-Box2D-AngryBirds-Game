@@ -22,6 +22,7 @@ PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _r
 	fixtureDef.shape = &circleShape;
 	fixtureDef.density = density;
 	fixtureDef.friction = 0.3f;
+	fixtureDef.restitution = 0.5f;
 	m_fixture = m_body->CreateFixture(&fixtureDef);
 
 	m_mesh = Mesh(Objects::verticesBox, Objects::indicesBox);
@@ -30,5 +31,5 @@ PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _r
 
 PhysicsCircle::~PhysicsCircle()
 {
-	//m_world->DestroyBody(m_body);
+	m_world->DestroyBody(m_body);
 }

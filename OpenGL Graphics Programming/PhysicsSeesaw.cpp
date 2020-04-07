@@ -40,5 +40,7 @@ PhysicsSeesaw::PhysicsSeesaw(b2World* world, const glm::vec2& position, const gl
 
 PhysicsSeesaw::~PhysicsSeesaw()
 {
-	//m_world->DestroyBody(m_body);
+	m_world->DestroyJoint(m_seesawJoint);
+	m_world->DestroyBody(m_groundBody);
+	m_world->DestroyBody(m_body);
 }

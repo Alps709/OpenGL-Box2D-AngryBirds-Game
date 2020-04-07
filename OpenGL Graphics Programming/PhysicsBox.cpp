@@ -29,5 +29,5 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 
 PhysicsBox::~PhysicsBox()
 {
-	//m_world->DestroyBody(m_body);
+	m_world->DestroyBody(m_body);
 }

@@ -59,8 +59,8 @@ GameManager::GameManager()
 	tempCircle->SetTexture0(m_angryBoidTexture);
 	m_physicsCircles.push_back(tempCircle);
 
-	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(350.0f, 0.0f), glm::vec2(200.0f, 10.0f), 10.0f);
+	//Create 1 seesaw joint
+	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(400.0f, 0.0f), glm::vec2(300.0f, 20.0f), 10.0f);
 	m_physicsSeesaw->SetTexture0(m_backgroundTexture);
 }
 
