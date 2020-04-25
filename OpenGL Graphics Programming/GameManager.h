@@ -62,7 +62,6 @@ private:
 	
 	//Clock
 	CClock m_clock;
-	double m_pillSpawnTimer = 0.0;
 
 	//Camera
 	std::unique_ptr<Camera> m_camera;
@@ -86,7 +85,8 @@ private:
 	//Box 2D Physics Objects
 	std::shared_ptr <PhysicsSeesaw> m_physicsSeesaw;
 	std::vector<std::shared_ptr<PhysicsBox>> m_physicsBoxes;
-	std::vector< std::shared_ptr<PhysicsCircle>> m_physicsCircles;
+	std::vector< std::shared_ptr<PhysicsCircle>> m_angryBoids;
+	std::vector< std::shared_ptr<PhysicsCircle>> m_piggies;
 	PhysicsCircle* m_selectedBoid = nullptr;
 
 	//Game Background

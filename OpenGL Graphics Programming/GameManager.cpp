@@ -20,7 +20,7 @@ GameManager::GameManager()
 	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
 
 	//Texture for the main angry boid
-	m_angryBoidTexture = new Texture("Resources/Images/AngryBoid.png", 0);
+	m_angryBoidTexture = new Texture("Resources/Images/RedBird.png", 0);
 
 	//Create 1 background object
 	m_backgroundObject = Object(m_backgroundMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
@@ -54,10 +54,13 @@ GameManager::GameManager()
 		m_physicsBoxes.push_back(tempBox);
 	}
 
-	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-400.0f, -100.0f), 25.0f, 25.0f);
-	tempCircle->SetTexture0(m_angryBoidTexture);
-	m_physicsCircles.push_back(tempCircle);
+	for (int i = 0; i < 4; i++)
+	{
+		//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+		std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-400.0f, -100.0f), 25.0f, 25.0f);
+		tempCircle->SetTexture0(m_angryBoidTexture);
+		m_angryBoids.push_back(tempCircle);
+	}
 
 	//Create 1 seesaw joint
 	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(400.0f, 0.0f), glm::vec2(300.0f, 20.0f), 10.0f);
@@ -70,7 +73,7 @@ GameManager::~GameManager()
 	//Clear the entities in the level
 	m_selectedBoid = nullptr;
 	m_physicsBoxes.clear();
-	m_physicsCircles.clear();
+	m_angryBoids.clear();
 
 	delete m_menuTitleText;
 	delete m_menuInstructText;
@@ -204,7 +207,7 @@ void GameManager::CheckMouseCollisions()
 	//If the left mouse button was clicked on this frame
 	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST && !m_mouseJoint)
 	{
-		for (auto& angryBoid : m_physicsCircles)
+		for (auto& angryBoid : m_angryBoids)
 		{
 			//Get the position of the angry boid
 			glm::vec2 angryBoidPos = Math::Box2DtoVec2(angryBoid->GetBody()->GetPosition());
@@ -317,7 +320,7 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 			pBox->SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox->GetBody()->GetAngle()), boxSize.x, boxSize.y);
 		}
 
-		for (auto& pCircle : m_physicsCircles)
+		for (auto& pCircle : m_angryBoids)
 		{
 			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle->GetBody()->GetPosition());
 			float circleRadius = pCircle->GetRadius();
@@ -355,7 +358,7 @@ void GameManager::Render()
 			pBox->Render(*m_camera);
 		}
 
-		for (auto& pCircle : m_physicsCircles)
+		for (auto& pCircle : m_angryBoids)
 		{
 			pCircle->Render(*m_camera);
 		}
@@ -385,7 +388,7 @@ void GameManager::Reset()
 		++i;
 	}
 
-	for (auto& angryBoid : m_physicsCircles)
+	for (auto& angryBoid : m_angryBoids)
 	{
 		angryBoid->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(-400.0f, -100.0f)), 0.0f);
 		angryBoid->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
