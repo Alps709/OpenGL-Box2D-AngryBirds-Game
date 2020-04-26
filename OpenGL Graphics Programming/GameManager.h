@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "clock.h"
 #include "PhysicsBox.h"
-#include "PhysicsCircle.h"
+#include "AngryBoid.h"
 #include "PhysicsSeesaw.h"
 #include <box2d.h>
 
@@ -85,7 +85,7 @@ private:
 	//Box 2D Physics Objects
 	std::shared_ptr <PhysicsSeesaw> m_physicsSeesaw;
 	std::vector<std::shared_ptr<PhysicsBox>> m_physicsBoxes;
-	std::vector< std::shared_ptr<PhysicsCircle>> m_angryBoids;
+	std::vector< std::shared_ptr<AngryBoid>> m_angryBoids;
 	std::vector< std::shared_ptr<PhysicsCircle>> m_piggies;
 	PhysicsCircle* m_selectedBoid = nullptr;
 

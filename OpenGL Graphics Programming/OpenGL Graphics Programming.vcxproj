@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AngryBoid.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="clock.cpp" />
     <ClCompile Include="GameManager.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="VertexBufferInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AngryBoid.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="clock.h" />
     <ClInclude Include="Debug.h" />

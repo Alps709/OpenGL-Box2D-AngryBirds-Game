@@ -43,6 +43,9 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{116acda6-4138-4ae7-9990-24642e8f7429}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics objects\Derived">
+      <UniqueIdentifier>{780d2c85-966e-4d4b-bf8a-380a2a9b6768}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -89,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="PhysicsSeesaw.cpp">
       <Filter>Source Files\PhysicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="AngryBoid.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="PhysicsSeesaw.h">
       <Filter>Header Files\Physics objects</Filter>
+    </ClInclude>
+    <ClInclude Include="AngryBoid.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

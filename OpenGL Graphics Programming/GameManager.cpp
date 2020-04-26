@@ -54,12 +54,18 @@ GameManager::GameManager()
 		m_physicsBoxes.push_back(tempBox);
 	}
 
-	for (int i = 0; i < 4; i++)
+	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+	std::shared_ptr<AngryBoid> tempBoid = std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-400.0f, -100.0f), 25.0f, 25.0f);
+	tempBoid->SetTexture0(m_angryBoidTexture);
+	tempBoid->SetFireable(true);
+	m_angryBoids.push_back(tempBoid);
+
+	for (int i = 0; i < 3; i++)
 	{
 		//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-		std::shared_ptr<PhysicsCircle> tempCircle = std::make_shared<PhysicsCircle>(m_World.get(), glm::vec2(-400.0f, -100.0f), 25.0f, 25.0f);
-		tempCircle->SetTexture0(m_angryBoidTexture);
-		m_angryBoids.push_back(tempCircle);
+		std::shared_ptr<AngryBoid> tempBoid = std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-inputManager.HSCREEN_WIDTH + 100 + (100 * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f);
+		tempBoid->SetTexture0(m_angryBoidTexture);
+		m_angryBoids.push_back(tempBoid);
 	}
 
 	//Create 1 seesaw joint
@@ -213,8 +219,11 @@ void GameManager::CheckMouseCollisions()
 			glm::vec2 angryBoidPos = Math::Box2DtoVec2(angryBoid->GetBody()->GetPosition());
 			float angryBoidRadius = angryBoid->GetRadius();
 
+			//If the distance is negative, then the click is inside the boid
+			bool mouseCollided = float(glm::distance(angryBoidPos, m_leftMouseDownPos) - angryBoidRadius) < 0.0f;
+
 			//Check if the mouse is colliding with the angry boid
-			if (float(glm::distance(angryBoidPos, m_leftMouseDownPos) - angryBoidRadius) < 0.0f)
+			if (mouseCollided && angryBoid->GetFireable())
 			{
 				//The player clicked on the angry boid
 				std::cout << "Colliding with angry boid!" << std::endl;
@@ -222,6 +231,9 @@ void GameManager::CheckMouseCollisions()
 				//Set the currently selected boid to the angry boid
 				m_selectedBoid = angryBoid.get();
 				b2Body* angryBoidBody = angryBoid->GetBody();
+
+				//Set the boid body to dynamic so it can move
+				angryBoidBody->SetType(b2_dynamicBody);
 				
 				//Create the mouse joint
 				b2MouseJointDef md;
@@ -233,6 +245,8 @@ void GameManager::CheckMouseCollisions()
 				md.target = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
 				md.maxForce = 1000.0f * angryBoidBody->GetMass();
 				m_mouseJoint = (b2MouseJoint*)m_World->CreateJoint(&md);
+
+				//Wake it up so it applies the force
 				angryBoidBody->SetAwake(true);
 			}
 		}
@@ -245,18 +259,20 @@ void GameManager::CheckMouseCollisions()
 		b2Vec2 newPos = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
 		m_mouseJoint->SetTarget(newPos);
 
-		glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
-		forceVec *= 2;
 
-		double point1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
-		double point2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
-		double point3 = Math::remap(forceVec.x, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
-		double point4 = Math::remap(forceVec.y, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
+		//Tried to draw a line to show which direction the bird is going to get shot
+		//glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
+		//forceVec *= 2;
 
-		glBegin(GL_LINES);
-		glVertex2f((float)point1, (float)point2);
-		glVertex2f((float)point3, (float)point4);
-		glEnd();
+		//double point1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
+		//double point2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
+		//double point3 = Math::remap(forceVec.x, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
+		//double point4 = Math::remap(forceVec.y, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
+
+		//glBegin(GL_LINES);
+		//glVertex2f((float)point1, (float)point2);
+		//glVertex2f((float)point3, (float)point4);
+		//glEnd();
 	}
 
 	//If the mouse has been released and the mouse joint exists
