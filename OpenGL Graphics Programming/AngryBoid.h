@@ -11,6 +11,7 @@ public:
 	void SetFireable(bool _fireable) { m_fireable = _fireable; }
 
 	bool GetFireable() { return m_fireable; }
+	glm::vec2 GetOriginalPosition() { return m_originalPosition; }
 
 private:
 

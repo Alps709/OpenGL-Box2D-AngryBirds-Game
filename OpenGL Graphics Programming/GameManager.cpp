@@ -55,7 +55,7 @@ GameManager::GameManager()
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	std::shared_ptr<AngryBoid> tempBoid = std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-400.0f, -100.0f), 25.0f, 25.0f);
+	std::shared_ptr<AngryBoid> tempBoid = std::make_shared<AngryBoid>(m_World.get(), m_boidFirePos, 25.0f, 25.0f);
 	tempBoid->SetTexture0(m_angryBoidTexture);
 	tempBoid->SetFireable(true);
 	m_angryBoids.push_back(tempBoid);
@@ -208,9 +208,114 @@ void GameManager::ProcessInput()
 	}
 }
 
-void GameManager::CheckMouseCollisions()
+void GameManager::Update(int _mousePosX, int _mousePosY)
 {
-	//If the left mouse button was clicked on this frame
+	//Update clock
+	m_clock.Process();
+	ProcessInput();
+
+	//Checks for collision of mouse click with collision of the angry boid
+	CheckMouseToBoidCollisions();
+
+	if (m_gameState == GAME_PLAY)
+	{
+		glm::vec2 seesawPos = Math::Box2DtoVec2(m_physicsSeesaw->GetBody()->GetPosition());
+		glm::vec2 seesawSize = m_physicsSeesaw->GetSize();
+		m_physicsSeesaw->SetPRS(seesawPos.x, seesawPos.y, glm::degrees(m_physicsSeesaw->GetBody()->GetAngle()), seesawSize.x, seesawSize.y);
+
+		for (auto& pBox : m_physicsBoxes)
+		{
+			glm::vec2 boxPos = Math::Box2DtoVec2(pBox->GetBody()->GetPosition());
+		    glm::vec2 boxSize = pBox->GetSize();
+			pBox->SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox->GetBody()->GetAngle()), boxSize.x, boxSize.y);
+		}
+
+		for (auto& pCircle : m_angryBoids)
+		{
+			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle->GetBody()->GetPosition());
+			float circleRadius = pCircle->GetRadius();
+			pCircle->SetPRS(circlePos.x, circlePos.y, glm::degrees(pCircle->GetBody()->GetAngle()), circleRadius * 2.0f, circleRadius * 2.0f);
+		}
+
+		MoveNextFireableBoid();
+
+		//Update physics simulation only during play
+		m_World->Step(1.0f / 60.0f, 12, 12);
+	}
+
+	//Update sounds
+	//m_audioSystem->update();
+
+	//Tell glut to call the render function again
+	glutPostRedisplay();
+}
+
+void GameManager::Render()
+{
+	//Clear the screen before every frame
+	Clear();
+
+	if (m_gameState == GAME_MENU)
+	{
+		m_menuTitleText->Render();
+		m_menuInstructText->Render();
+	}
+	else if (m_gameState == GAME_PLAY)
+	{
+
+		m_physicsSeesaw->Render(*m_camera);
+
+		for (auto& pBox : m_physicsBoxes)
+		{
+			pBox->Render(*m_camera);
+		}
+
+		for (auto& pBoid : m_angryBoids)
+		{
+			pBoid->Render(*m_camera);
+		}
+	}
+
+	glutSwapBuffers();
+	u_frameNum++;
+}
+
+void GameManager::Clear()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+}
+
+void GameManager::Reset()
+{
+	//Clear the entities in the level
+	m_selectedBoid = nullptr;
+
+	int i = 0;
+	for (auto& box : m_physicsBoxes)
+	{
+		box->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i)), 0.0f);
+		box->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		box->GetBody()->SetAngularVelocity(0.0f);
+		++i;
+	}
+
+	for (auto& angryBoid : m_angryBoids)
+	{
+		angryBoid->GetBody()->SetTransform(Math::Vec2toBox2D(angryBoid->GetOriginalPosition()), 0.0f);
+		angryBoid->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		angryBoid->GetBody()->SetAngularVelocity(0.0f);
+		angryBoid->GetBody()->SetGravityScale(0.0f);
+		angryBoid->GetBody()->SetType(b2_staticBody);
+	}
+
+	m_physicsSeesaw->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(400.0f, 0.0f)), 0.0f);
+	m_physicsSeesaw->GetBody()->SetAngularVelocity(0.0f);
+}
+
+void GameManager::CheckMouseToBoidCollisions()
+{
+	//If the left mouse button was clicked on this frame and there is no mouse joint
 	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST && !m_mouseJoint)
 	{
 		for (auto& angryBoid : m_angryBoids)
@@ -222,7 +327,7 @@ void GameManager::CheckMouseCollisions()
 			//If the distance is negative, then the click is inside the boid
 			bool mouseCollided = float(glm::distance(angryBoidPos, m_leftMouseDownPos) - angryBoidRadius) < 0.0f;
 
-			//Check if the mouse is colliding with the angry boid
+			//Check if the mouse is colliding with the angry boid and we can fire it
 			if (mouseCollided && angryBoid->GetFireable())
 			{
 				//The player clicked on the angry boid
@@ -234,7 +339,7 @@ void GameManager::CheckMouseCollisions()
 
 				//Set the boid body to dynamic so it can move
 				angryBoidBody->SetType(b2_dynamicBody);
-				
+
 				//Create the mouse joint
 				b2MouseJointDef md;
 				md.bodyA = m_groundBody;
@@ -261,6 +366,7 @@ void GameManager::CheckMouseCollisions()
 
 
 		//Tried to draw a line to show which direction the bird is going to get shot
+
 		//glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
 		//forceVec *= 2;
 
@@ -295,6 +401,23 @@ void GameManager::CheckMouseCollisions()
 			boidBody->SetGravityScale(1.0f);
 		}
 
+		m_selectedBoid->SetFireable(false);
+		
+		//Find the position of the selected boid in the vector (this will always find something)
+		auto iteratorToSelectedBoid = std::find_if(m_angryBoids.begin(), m_angryBoids.end(), 
+			[this](std::shared_ptr<AngryBoid> const& i) { return i.get() == m_selectedBoid; });
+
+		//If incrementing the iterator reaches the end, then the player has fired all the boids
+		if (++iteratorToSelectedBoid == m_angryBoids.end())
+		{
+			m_nextBoidToFire = nullptr;
+		}
+		//If incrementing the iterator does not reach the end, then there is another boid that can be fired
+		else
+		{
+			m_nextBoidToFire = iteratorToSelectedBoid->get();
+			m_timeOfLastFiredBoid = m_clock.GetTimeElapsedS();
+		}
 		m_selectedBoid = nullptr;
 	}
 
@@ -304,112 +427,24 @@ void GameManager::CheckMouseCollisions()
 		for (auto& pBox : m_physicsBoxes)
 		{
 			glm::vec2 mousePos = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
-			auto boxPos = Math::Box2DtoVec2(pBox.GetBody()->GetPosition());
+			auto boxPos = Math::Box2DtoVec2(pBox->GetBody()->GetPosition());
 			glm::vec2 vecToMouseClick = mousePos - boxPos;
 
 			vecToMouseClick = glm::normalize(vecToMouseClick) * 1000.0f;
-			
-			pBox.GetBody()->ApplyForce(Math::Vec2toBox2D(vecToMouseClick), pBox.GetBody()->GetPosition(), true);
+
+			pBox->GetBody()->ApplyForce(Math::Vec2toBox2D(vecToMouseClick), pBox->GetBody()->GetPosition(), true);
 		}
 	}*/
 }
 
-void GameManager::Update(int _mousePosX, int _mousePosY)
+void GameManager::MoveNextFireableBoid()
 {
-	//Update clock
-	m_clock.Process();
-	ProcessInput();
-
-	//Checks for collision of mouse click with collision of the angry boid
-	CheckMouseCollisions();
-
-	if (m_gameState == GAME_PLAY)
+	//If there is a boid to fire and it has been over 2 seconds since the previous boid was fired
+	//Then move the next boid into the fire position
+	if (m_nextBoidToFire != nullptr && m_clock.GetTimeElapsedS() - m_timeOfLastFiredBoid > 2.0)
 	{
-		glm::vec2 seesawPos = Math::Box2DtoVec2(m_physicsSeesaw->GetBody()->GetPosition());
-		glm::vec2 seesawSize = m_physicsSeesaw->GetSize();
-		m_physicsSeesaw->SetPRS(seesawPos.x, seesawPos.y, glm::degrees(m_physicsSeesaw->GetBody()->GetAngle()), seesawSize.x, seesawSize.y);
-
-		for (auto& pBox : m_physicsBoxes)
-		{
-			glm::vec2 boxPos = Math::Box2DtoVec2(pBox->GetBody()->GetPosition());
-		    glm::vec2 boxSize = pBox->GetSize();
-			pBox->SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox->GetBody()->GetAngle()), boxSize.x, boxSize.y);
-		}
-
-		for (auto& pCircle : m_angryBoids)
-		{
-			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle->GetBody()->GetPosition());
-			float circleRadius = pCircle->GetRadius();
-			pCircle->SetPRS(circlePos.x, circlePos.y, glm::degrees(pCircle->GetBody()->GetAngle()), circleRadius * 2.0f, circleRadius * 2.0f);
-		}
-
-		//Update physics simulation only during play
-		m_World->Step(1.0f / 60.0f, 12, 12);
-	}
-
-	//Update sounds
-	//m_audioSystem->update();
-
-	//Tell glut to call the render function again
-	glutPostRedisplay();
-}
-
-void GameManager::Render()
-{
-	//Clear the screen before every frame
-	Clear();
-
-	if (m_gameState == GAME_MENU)
-	{
-		m_menuTitleText->Render();
-		m_menuInstructText->Render();
-	}
-	else if (m_gameState == GAME_PLAY)
-	{
-
-		m_physicsSeesaw->Render(*m_camera);
-
-		for (auto& pBox : m_physicsBoxes)
-		{
-			pBox->Render(*m_camera);
-		}
-
-		for (auto& pCircle : m_angryBoids)
-		{
-			pCircle->Render(*m_camera);
-		}
-	}
-
-	glutSwapBuffers();
-	u_frameNum++;
-}
-
-void GameManager::Clear()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-}
-
-void GameManager::Reset()
-{
-	//Clear the entities in the level
-	m_selectedBoid = nullptr;
-
-	int i = 0;
-	for (auto& box : m_physicsBoxes)
-	{
-		box->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i)), 0.0f);
-		box->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-		box->GetBody()->SetAngularVelocity(0.0f);
-		++i;
-	}
-
-	for (auto& angryBoid : m_angryBoids)
-	{
-		angryBoid->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(-400.0f, -100.0f)), 0.0f);
-		angryBoid->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-		angryBoid->GetBody()->SetAngularVelocity(0.0f);
-		angryBoid->GetBody()->SetGravityScale(0.0f);
+		m_nextBoidToFire->GetBody()->SetTransform(Math::Vec2toBox2D(m_boidFirePos), 0.0f);
+		m_nextBoidToFire->SetFireable(true);
 	}
 }
 

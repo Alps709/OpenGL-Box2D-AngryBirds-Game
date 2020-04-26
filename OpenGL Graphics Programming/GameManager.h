@@ -36,7 +36,10 @@ public:
 	//void AudioInitialise();
 	void ProcessInput();
 
-	void CheckMouseCollisions();
+	//Handle what happens when the player clicks on a boid
+	void CheckMouseToBoidCollisions();
+
+	void MoveNextFireableBoid();
 
 	//Create the physical screen borders for the box 2d world
 	void CreateScreenBorderWalls();
@@ -87,7 +90,10 @@ private:
 	std::vector<std::shared_ptr<PhysicsBox>> m_physicsBoxes;
 	std::vector< std::shared_ptr<AngryBoid>> m_angryBoids;
 	std::vector< std::shared_ptr<PhysicsCircle>> m_piggies;
-	PhysicsCircle* m_selectedBoid = nullptr;
+	AngryBoid* m_selectedBoid = nullptr;
+	AngryBoid* m_nextBoidToFire = nullptr;
+	double m_timeOfLastFiredBoid = 0.0;
+	glm::vec2 m_boidFirePos = glm::vec2(-400.0f, -100.0f);
 
 	//Game Background
 	Object m_backgroundObject;
