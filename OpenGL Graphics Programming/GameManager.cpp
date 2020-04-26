@@ -199,12 +199,6 @@ void GameManager::ProcessInput()
 	if (inputManager.KeyState['r'] == INPUT_DOWN_FIRST)
 	{
 		Reset();
-
-		if (m_mouseJoint)
-		{
-			m_World->DestroyJoint(m_mouseJoint);
-			m_mouseJoint = nullptr;
-		}
 	}
 }
 
@@ -288,25 +282,39 @@ void GameManager::Clear()
 
 void GameManager::Reset()
 {
-	//Clear the entities in the level
+	m_timeOfLastFiredBoid = 0.0f;
+
+	if (m_mouseJoint)
+	{
+		m_World->DestroyJoint(m_mouseJoint);
+		m_mouseJoint = nullptr;
+	}
+
 	m_selectedBoid = nullptr;
+	m_nextBoidToFire = nullptr;
 
 	int i = 0;
-	for (auto& box : m_physicsBoxes)
+	for (auto box : m_physicsBoxes)
 	{
 		box->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i)), 0.0f);
 		box->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 		box->GetBody()->SetAngularVelocity(0.0f);
 		++i;
 	}
-
-	for (auto& angryBoid : m_angryBoids)
+	
+	i = 0;
+	for (auto angryBoid : m_angryBoids)
 	{
+		//Set it so you can fire the first bird again
+		if (i == 0) { angryBoid->SetFireable(true); } else { angryBoid->SetFireable(false); }
+			
 		angryBoid->GetBody()->SetTransform(Math::Vec2toBox2D(angryBoid->GetOriginalPosition()), 0.0f);
 		angryBoid->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 		angryBoid->GetBody()->SetAngularVelocity(0.0f);
 		angryBoid->GetBody()->SetGravityScale(0.0f);
 		angryBoid->GetBody()->SetType(b2_staticBody);
+
+		i++;
 	}
 
 	m_physicsSeesaw->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(400.0f, 0.0f)), 0.0f);
@@ -315,11 +323,17 @@ void GameManager::Reset()
 
 void GameManager::CheckMouseToBoidCollisions()
 {
-	//If the left mouse button was clicked on this frame and there is no mouse joint
+	//If the left mouse button was clicked this frame and there is no mouse joint
 	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST && !m_mouseJoint)
 	{
 		for (auto& angryBoid : m_angryBoids)
 		{
+			//If the current boid can't be fired skip it
+			if (!angryBoid->GetFireable())
+			{
+				continue;
+			}
+
 			//Get the position of the angry boid
 			glm::vec2 angryBoidPos = Math::Box2DtoVec2(angryBoid->GetBody()->GetPosition());
 			float angryBoidRadius = angryBoid->GetRadius();
@@ -328,31 +342,32 @@ void GameManager::CheckMouseToBoidCollisions()
 			bool mouseCollided = float(glm::distance(angryBoidPos, m_leftMouseDownPos) - angryBoidRadius) < 0.0f;
 
 			//Check if the mouse is colliding with the angry boid and we can fire it
-			if (mouseCollided && angryBoid->GetFireable())
+			if (mouseCollided)
 			{
 				//The player clicked on the angry boid
 				std::cout << "Colliding with angry boid!" << std::endl;
 
 				//Set the currently selected boid to the angry boid
 				m_selectedBoid = angryBoid.get();
-				b2Body* angryBoidBody = angryBoid->GetBody();
+				b2Body& angryBoidBody = *(angryBoid->GetBody());
 
 				//Set the boid body to dynamic so it can move
-				angryBoidBody->SetType(b2_dynamicBody);
+				angryBoidBody.SetType(b2_dynamicBody);
 
 				//Create the mouse joint
 				b2MouseJointDef md;
 				md.bodyA = m_groundBody;
-				md.bodyB = angryBoidBody;
+				md.bodyB = &angryBoidBody;
 
 				//The target is where the mousejoint will move the angry boid
 				//Target is the mouse position
 				md.target = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
-				md.maxForce = 1000.0f * angryBoidBody->GetMass();
+				md.maxForce = 1000.0f * angryBoidBody.GetMass();
 				m_mouseJoint = (b2MouseJoint*)m_World->CreateJoint(&md);
 
 				//Wake it up so it applies the force
-				angryBoidBody->SetAwake(true);
+				angryBoidBody.SetAwake(true);
+				break;
 			}
 		}
 	}
@@ -388,17 +403,17 @@ void GameManager::CheckMouseToBoidCollisions()
 		m_mouseJoint = nullptr;
 
 		//Make the angry boid get shot towards where it was first clicked on
-		b2Body* boidBody = m_selectedBoid->GetBody();
+		b2Body& boidBody = *(m_selectedBoid->GetBody());
 
 		//Calculate the force vector
 		glm::vec2 forceVec = m_leftMouseDownPos - m_leftMouseUpPos;
 		if (glm::length(forceVec) != 0)
 		{
-			forceVec *= boidBody->GetMass() * 100.0f;
+			forceVec *= boidBody.GetMass() * 100.0f;
 
 			//Apply the force to the angry boid so that it gets flung when the mouse is let go
-			boidBody->ApplyForce(Math::Vec2toBox2D(forceVec), boidBody->GetPosition(), true);
-			boidBody->SetGravityScale(1.0f);
+			boidBody.ApplyForce(Math::Vec2toBox2D(forceVec), boidBody.GetPosition(), true);
+			boidBody.SetGravityScale(1.0f);
 		}
 
 		m_selectedBoid->SetFireable(false);
@@ -439,9 +454,9 @@ void GameManager::CheckMouseToBoidCollisions()
 
 void GameManager::MoveNextFireableBoid()
 {
-	//If there is a boid to fire and it has been over 2 seconds since the previous boid was fired
+	//If there is a boid to fire and it has been over 1.5 seconds since the previous boid was fired
 	//Then move the next boid into the fire position
-	if (m_nextBoidToFire != nullptr && m_clock.GetTimeElapsedS() - m_timeOfLastFiredBoid > 2.0)
+	if (m_nextBoidToFire != nullptr && !m_nextBoidToFire->GetFireable() && m_clock.GetTimeElapsedS() - m_timeOfLastFiredBoid > 1.5)
 	{
 		m_nextBoidToFire->GetBody()->SetTransform(Math::Vec2toBox2D(m_boidFirePos), 0.0f);
 		m_nextBoidToFire->SetFireable(true);

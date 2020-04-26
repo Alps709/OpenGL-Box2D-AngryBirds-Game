@@ -46,6 +46,9 @@
     <Filter Include="Header Files\Physics objects\Derived">
       <UniqueIdentifier>{780d2c85-966e-4d4b-bf8a-380a2a9b6768}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PhysicsObjects\Derived">
+      <UniqueIdentifier>{74197c98-2fd2-40a5-8c74-e4d2f84f35c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -94,7 +97,7 @@
       <Filter>Source Files\PhysicsObjects</Filter>
     </ClCompile>
     <ClCompile Include="AngryBoid.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\PhysicsObjects\Derived</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +156,7 @@
       <Filter>Header Files\Physics objects</Filter>
     </ClInclude>
     <ClInclude Include="AngryBoid.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Physics objects\Derived</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -64,7 +64,7 @@ namespace Math
 		return (reversedOutput) ? (newMax - portion) : (portion + newMin);
 	}
 
-	const unsigned int Box2DScale = 100;
+	const float Box2DScale = 100.0f;
 
 	inline glm::vec2 Box2DtoVec2(b2Vec2 _vec)
 	{
