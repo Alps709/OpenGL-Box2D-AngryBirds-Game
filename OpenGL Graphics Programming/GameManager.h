@@ -90,10 +90,24 @@ private:
 	std::vector<std::shared_ptr<PhysicsBox>> m_physicsBoxes;
 	std::vector< std::shared_ptr<AngryBoid>> m_angryBoids;
 	std::vector< std::shared_ptr<PhysicsCircle>> m_piggies;
+
+	//Used for dragging and shooting the boids
 	AngryBoid* m_selectedBoid = nullptr;
 	AngryBoid* m_nextBoidToFire = nullptr;
+
+	//Used to wait for a certain amount before moving the next boid to the firing position
 	double m_timeOfLastFiredBoid = 0.0;
+
+	//The position that a boid will move to when it can be fired
 	glm::vec2 m_boidFirePos = glm::vec2(-400.0f, -100.0f);
+
+	//Line vertices for the bird shoot direction line
+	bool m_drawLine = false;
+	double m_shootLinePoint1;
+	double m_shootLinePoint2;
+	double m_shootLinePoint3;
+	double m_shootLinePoint4;
+
 
 	//Game Background
 	Object m_backgroundObject;

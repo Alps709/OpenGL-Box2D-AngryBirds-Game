@@ -268,6 +268,14 @@ void GameManager::Render()
 		{
 			pBoid->Render(*m_camera);
 		}
+
+		if (m_drawLine)
+		{
+			glBegin(GL_LINES);
+			glVertex2f((float)m_shootLinePoint1, (float)m_shootLinePoint2);
+			glVertex2f((float)m_shootLinePoint3, (float)m_shootLinePoint4);
+			glEnd();
+		}
 	}
 
 	glutSwapBuffers();
@@ -382,18 +390,17 @@ void GameManager::CheckMouseToBoidCollisions()
 
 		//Tried to draw a line to show which direction the bird is going to get shot
 
-		//glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
+		glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
 		//forceVec *= 2;
 
-		//double point1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
-		//double point2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
-		//double point3 = Math::remap(forceVec.x, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1, 1);
-		//double point4 = Math::remap(forceVec.y, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1, 1);
-
-		//glBegin(GL_LINES);
-		//glVertex2f((float)point1, (float)point2);
-		//glVertex2f((float)point3, (float)point4);
-		//glEnd();
+		//Calculate the shoot line 
+		m_drawLine = true;
+		m_shootLinePoint1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1.0, 1.0);
+		m_shootLinePoint2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
+		auto temp1        = Math::remap(    m_leftMouseDownPos.x, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1.0, 1.0);
+		auto temp2        = Math::remap(    m_leftMouseDownPos.y, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
+		m_shootLinePoint3 = (temp1 - m_shootLinePoint1) * 2.0f;
+		m_shootLinePoint4 = (temp2 - m_shootLinePoint2) * 2.0f;
 	}
 
 	//If the mouse has been released and the mouse joint exists
@@ -401,6 +408,8 @@ void GameManager::CheckMouseToBoidCollisions()
 	{
 		m_World->DestroyJoint(m_mouseJoint);
 		m_mouseJoint = nullptr;
+
+		m_drawLine = false;
 
 		//Make the angry boid get shot towards where it was first clicked on
 		b2Body& boidBody = *(m_selectedBoid->GetBody());
@@ -456,10 +465,11 @@ void GameManager::MoveNextFireableBoid()
 {
 	//If there is a boid to fire and it has been over 1.5 seconds since the previous boid was fired
 	//Then move the next boid into the fire position
-	if (m_nextBoidToFire != nullptr && !m_nextBoidToFire->GetFireable() && m_clock.GetTimeElapsedS() - m_timeOfLastFiredBoid > 1.5)
+	if (m_nextBoidToFire != nullptr && m_clock.GetTimeElapsedS() - m_timeOfLastFiredBoid > 1.5)
 	{
 		m_nextBoidToFire->GetBody()->SetTransform(Math::Vec2toBox2D(m_boidFirePos), 0.0f);
 		m_nextBoidToFire->SetFireable(true);
+		m_nextBoidToFire = nullptr;
 	}
 }
 
