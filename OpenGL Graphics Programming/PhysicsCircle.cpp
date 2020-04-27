@@ -1,5 +1,6 @@
 #include "PhysicsCircle.h"
 #include "Obj.h"
+#include "Math.h"
 
 PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _radius, float density)
 {

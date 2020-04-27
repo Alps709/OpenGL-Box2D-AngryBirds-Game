@@ -36,6 +36,10 @@ protected:
 	float m_rotationZ = 0.0f;
 	glm::vec2 m_size{ 1.0f, 1.0f };
 	double m_colliderRadius = 10.0f;
+
+	std::string m_tag;
+
+	std::shared_ptr<PhysicsObjectData> m_userData;
 };
 
 

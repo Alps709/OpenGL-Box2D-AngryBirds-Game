@@ -9,6 +9,7 @@ public:
 	~Piggie() = default;
 
 	void SetFireable(bool _fireable) { m_fireable = _fireable; }
+	void SetUserData();
 
 	bool GetFireable() { return m_fireable; }
 	glm::vec2 GetOriginalPosition() { return m_originalPosition; }
@@ -22,5 +23,7 @@ private:
 	bool m_toBeDestroyed;
 
 	glm::vec2 m_originalPosition;
+
+	std::shared_ptr<PhysicsObjectData> m_userData;
 };
 

@@ -14,7 +14,6 @@ GameManager::GameManager()
 	//Create defaut shader
 	m_defaultShader = Shader();
 
-
 	//Set background mesh and texture
 	m_backgroundMesh = Mesh(Objects::verticesBackground, Objects::indicesBackground);
 	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
@@ -74,11 +73,22 @@ GameManager::GameManager()
 		m_angryBoids.back()->SetFireable(true);
 	}
 
-	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+	//Create 1 piggie on the seesaw
 	m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(400.0f, 40.0f), 25.0f, 25.0f)));
 	m_piggies.back()->SetTexture0(m_piggieTexture);
 	m_piggies.back()->SetTexture1(m_piggieTexture1);
 	m_piggies.back()->SetFireable(true);
+	m_piggies.back()->SetUserData();
+
+	for (int i = 0; i < 3; i++)
+	{
+		//Create 3 piggies
+		m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(400.0f, 40.0f), 25.0f, 25.0f)));
+		m_piggies.back()->SetTexture0(m_piggieTexture);
+		m_piggies.back()->SetTexture1(m_piggieTexture1);
+		m_piggies.back()->SetFireable(true);
+		m_piggies.back()->SetUserData();
+	}
 
 	//Create 1 seesaw joint
 	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(400.0f, 0.0f), glm::vec2(300.0f, 20.0f), 10.0f);
@@ -351,7 +361,7 @@ void GameManager::Reset()
 
 	for (auto piggie : m_piggies)
 	{
-
+		piggie->SetDrawnTex(0);
 		piggie->GetBody()->SetTransform(Math::Vec2toBox2D(piggie->GetOriginalPosition()), 0.0f);
 		piggie->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 		piggie->GetBody()->SetAngularVelocity(0.0f);
@@ -418,10 +428,10 @@ void GameManager::CheckMouseToBoidCollisions()
 	{
 		//Update the target to the new mouse pos
 		glm::vec2 vecToMouse = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY) - m_leftMouseDownPos;
-		if (glm::length(vecToMouse) > 500.0f)
+		/*if (glm::length(vecToMouse) > 500.0f)
 		{
 			Math::LimitVector2D(vecToMouse, 500.0f);
-		}
+		}*/
 		b2Vec2 newPos = Math::Vec2toBox2D(m_leftMouseDownPos + vecToMouse);
 		m_mouseJoint->SetTarget(newPos);
 

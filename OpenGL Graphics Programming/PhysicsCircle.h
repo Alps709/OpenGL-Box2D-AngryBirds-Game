@@ -2,13 +2,7 @@
 
 #include <box2d.h>
 #include "Object.h"
-#include "Math.h"
-#include "Mesh.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Camera.h"
-#include <detail/type_vec3.hpp>
-#include <detail/type_mat4x4.hpp>
+
 
 class PhysicsCircle : public Object
 {

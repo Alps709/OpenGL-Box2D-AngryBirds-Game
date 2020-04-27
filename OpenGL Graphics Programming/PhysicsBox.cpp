@@ -1,5 +1,6 @@
 #include "PhysicsBox.h"
 #include "Obj.h"
+#include "Math.h"
 
 PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec2& size, float density)
 {

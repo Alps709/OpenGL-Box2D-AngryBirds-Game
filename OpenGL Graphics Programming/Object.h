@@ -7,6 +7,23 @@
 #include <detail/type_vec3.hpp>
 #include <detail/type_mat4x4.hpp>
 
+//To be used for the physics objects
+struct PhysicsObjectData
+{
+	PhysicsObjectData(std::string _tag, Texture* _tex0, Texture* _tex1, Texture** _ptrToDrawnTex)
+	{
+		m_tag = _tag;
+		m_tex0 = _tex0;
+		m_tex1 = _tex1;
+		m_ptrToDrawnTex = _ptrToDrawnTex;
+	}
+
+	std::string m_tag;
+	Texture** m_ptrToDrawnTex;
+	Texture* m_tex0;
+	Texture* m_tex1;
+};
+
 class  Object
 {
 public:

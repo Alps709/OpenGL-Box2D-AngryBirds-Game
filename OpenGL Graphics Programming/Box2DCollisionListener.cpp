@@ -9,34 +9,32 @@ void Box2DCollisionListener::BeginContact(b2Contact* _contact)
 	auto tempB = _contact->GetFixtureB()->GetBody();
 
 	//Convert the tag to a string pointer, if it's not null get the tag string
-	PhysicsCircle* tagA = (PhysicsCircle*)tempA->GetUserData() == nullptr ? nullptr : (PhysicsCircle*)tempA->GetUserData();
-	PhysicsCircle* tagB = (PhysicsCircle*)tempB->GetUserData() == nullptr ? nullptr : (PhysicsCircle*)tempA->GetUserData();
+	PhysicsObjectData* tagA = (PhysicsObjectData*)tempA->GetUserData() == nullptr ? nullptr : (PhysicsObjectData*)tempA->GetUserData();
+	PhysicsObjectData* tagB = (PhysicsObjectData*)tempB->GetUserData() == nullptr ? nullptr : (PhysicsObjectData*)tempB->GetUserData();
 
 	if (tagA && tagB)
 	{
-		bool safe = true;
-		try
+		std::string tagAS = tagA->m_tag;
+		std::string tagBS = tagB->m_tag;
+
+		if (tagAS == "Piggie")
 		{
-			tagA->GetTag();
-			tagB->GetTag();
+			std::cout << "Hit Piggie" << std::endl;
 		}
-		catch (...)
+		if (tagBS == "Piggie")
 		{
-			safe = false;
+			std::cout << "Hit Piggie" << std::endl;
 		}
 
-		if (safe)
+		if (tagAS == "AngryBoid" && tagBS == "Piggie")
 		{
-			if (tagA->GetTag() == "AngryBoid" && tagB->GetTag() == "Piggie")
-			{
-				std::cout << "Piggie killed!" << std::endl;
-				tagB->SetDrawnTex(1);
-			}
-			else if (tagB->GetTag() == "AngryBoid" && tagA->GetTag() == "Piggie")
-			{
-				std::cout << "Piggie killed!" << std::endl;
-				tagA->SetDrawnTex(1);
-			}
+			std::cout << "Piggie killed!" << std::endl;
+			*(tagB->m_ptrToDrawnTex) = tagB->m_tex1;
+		}
+		else if (tagAS == "Piggie" && tagBS == "AngryBoid")
+		{
+			std::cout << "Piggie killed!" << std::endl;
+			*(tagA->m_ptrToDrawnTex) = tagA->m_tex1;
 		}
 	}
 	//tempB->ApplyLinearImpulseToCenter(Math::Vec2toBox2D(glm::vec2(0.0f, 100.0f * tempB->GetMass())), true);
@@ -54,5 +52,35 @@ void Box2DCollisionListener::PreSolve(b2Contact* _contact, const b2Manifold* _ol
 
 void Box2DCollisionListener::PostSolve(b2Contact* _contact, const b2ContactImpulse* _impulse)
 {
-	//std::cout << "Post solve contact!" << std::endl;
+	auto tempA = _contact->GetFixtureA()->GetBody();
+	auto tempB = _contact->GetFixtureB()->GetBody();
+
+	//Convert the tag to a string pointer, if it's not null get the tag string
+	PhysicsObjectData* tagA = (PhysicsObjectData*)tempA->GetUserData() == nullptr ? nullptr : (PhysicsObjectData*)tempA->GetUserData();
+	PhysicsObjectData* tagB = (PhysicsObjectData*)tempB->GetUserData() == nullptr ? nullptr : (PhysicsObjectData*)tempB->GetUserData();
+
+	if (tagA && tagB)
+	{
+		std::string tagAS = tagA->m_tag;
+		std::string tagBS = tagB->m_tag;
+
+		if (tagAS == "Box" && tagBS == "Piggie")
+		{
+			if (_impulse->normalImpulses[0] > 2.5f)
+			{
+				std::cout << "Piggie killed!" << std::endl;
+
+				*(tagB->m_ptrToDrawnTex) = tagB->m_tex1;
+			}
+		}
+		else if (tagAS == "Piggie" && tagBS == "Box")
+		{
+			if (_impulse->normalImpulses[0] > 2.5f)
+			{
+				std::cout << "Piggie killed!" << std::endl;
+
+				*(tagA->m_ptrToDrawnTex) = tagA->m_tex1;
+			}
+		}
+	}
 }

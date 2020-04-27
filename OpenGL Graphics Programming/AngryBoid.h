@@ -22,5 +22,7 @@ private:
 	bool m_toBeDestroyed;
 
 	glm::vec2 m_originalPosition;
+
+	std::shared_ptr<PhysicsObjectData> m_userData;
 };
 

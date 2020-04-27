@@ -36,6 +36,10 @@ PhysicsSeesaw::PhysicsSeesaw(b2World* world, const glm::vec2& position, const gl
 
 	m_mesh = Mesh(Objects::verticesBox, Objects::indicesBox);
 	m_shader = Shader();
+
+	m_tag = "Seesaw";
+	m_userData = std::make_shared<PhysicsObjectData>(m_tag, m_tex0, m_tex1, &m_drawnTex);
+	m_body->SetUserData(static_cast<void*>(m_userData.get()));
 }
 
 PhysicsSeesaw::~PhysicsSeesaw()
