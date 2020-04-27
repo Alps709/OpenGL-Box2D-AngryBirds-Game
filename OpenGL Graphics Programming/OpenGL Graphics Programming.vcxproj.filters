@@ -99,6 +99,12 @@
     <ClCompile Include="AngryBoid.cpp">
       <Filter>Source Files\PhysicsObjects\Derived</Filter>
     </ClCompile>
+    <ClCompile Include="Box2DCollisionListener.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Piggie.cpp">
+      <Filter>Source Files\PhysicsObjects\Derived</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture.h">
@@ -156,6 +162,12 @@
       <Filter>Header Files\Physics objects</Filter>
     </ClInclude>
     <ClInclude Include="AngryBoid.h">
+      <Filter>Header Files\Physics objects\Derived</Filter>
+    </ClInclude>
+    <ClInclude Include="Box2DCollisionListener.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Piggie.h">
       <Filter>Header Files\Physics objects\Derived</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,12 +1,12 @@
 #pragma once
 #include "PhysicsCircle.h"
 
-class AngryBoid : public PhysicsCircle
+class Piggie : public PhysicsCircle
 {
 public:
-	AngryBoid() = default;
-	AngryBoid(b2World * _world, const glm::vec2 & _position, float _radius, float _density = 1.0f);
-	~AngryBoid() = default;
+	Piggie() = default;
+	Piggie(b2World * _world, const glm::vec2 & _position, float _radius, float _density = 1.0f);
+	~Piggie() = default;
 
 	void SetFireable(bool _fireable) { m_fireable = _fireable; }
 

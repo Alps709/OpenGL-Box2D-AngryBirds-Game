@@ -13,6 +13,8 @@ PhysicsBox::PhysicsBox(b2World* world, const glm::vec2& position, const glm::vec
 	bodyDef.position.Set(tempPos.x, tempPos.y);
 	m_body = m_world->CreateBody(&bodyDef);
 
+	m_body->SetUserData(&m_tag);
+
 	const auto tempShape = Math::Vec2toBox2D(size);
 	b2PolygonShape boxShape;
 	boxShape.SetAsBox(tempShape.x / 2.0f, tempShape.y / 2.0f);

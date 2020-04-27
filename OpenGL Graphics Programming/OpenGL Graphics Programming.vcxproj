@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AngryBoid.cpp" />
+    <ClCompile Include="Box2DCollisionListener.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="clock.cpp" />
     <ClCompile Include="GameManager.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="PhysicsBox.cpp" />
     <ClCompile Include="PhysicsCircle.cpp" />
     <ClCompile Include="PhysicsSeesaw.cpp" />
+    <ClCompile Include="Piggie.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="TextLabel.cpp" />
@@ -172,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AngryBoid.h" />
+    <ClInclude Include="Box2DCollisionListener.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="clock.h" />
     <ClInclude Include="Debug.h" />
@@ -185,6 +188,7 @@
     <ClInclude Include="PhysicsBox.h" />
     <ClInclude Include="PhysicsCircle.h" />
     <ClInclude Include="PhysicsSeesaw.h" />
+    <ClInclude Include="Piggie.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="TextLabel.h" />

@@ -14,6 +14,8 @@ PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _r
 	bodyDef.position.Set(tempPos.x, tempPos.y);
 	m_body = world->CreateBody(&bodyDef);
 
+	m_body->SetUserData(&m_tag);
+
 	b2CircleShape circleShape;
 	circleShape.m_p.Set(0, 0); //position, relative to body position
 	circleShape.m_radius = Math::FloatToBox2D(_radius);

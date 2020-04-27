@@ -28,12 +28,25 @@ void Object::SetPosition(glm::vec2 _pos)
 void Object::SetTexture0(Texture* _tex)
 {
 	m_tex0 = _tex;
+	m_drawnTex = m_tex0;
 }
 
-//void Object::SetTexture1(Texture* _tex)
-//{
-//	m_tex1 = _tex;
-//}
+void Object::SetTexture1(Texture* _tex)
+{
+	m_tex1 = _tex;
+}
+
+void Object::SetDrawnTex(int _texNum)
+{
+	if (_texNum == 0)
+	{
+		m_drawnTex = m_tex0;
+	}
+	else if (_texNum == 1)
+	{
+		m_drawnTex = m_tex1;
+	}
+}
 
 void Object::ChangePRS(float _translateX, float _translateY, float _rotationAngle, float _scaleX, float _scaleY)
 {
@@ -81,7 +94,7 @@ void Object::Render(Camera& _myCamera)
 	glm::mat4 pvmMat = projViewMat * m_modelMat;
 
 	//Prepare the object for drawing
-	BindTexture(0);
+	BindTexture();
 
 	//Set object specific uniforms
 	m_shader.SetUniformMat4f("u_PVM", pvmMat);
@@ -93,14 +106,7 @@ void Object::Render(Camera& _myCamera)
 	Shader::Unbind();
 }
 
-void Object::BindTexture(unsigned int _texNum) const
+void Object::BindTexture() const
 {
-	if (_texNum == 0)
-	{
-		m_tex0->Bind();
-	}
-	//else if (_texNum == 1)
-	//{
-	//	m_tex1->Bind();
-	//}
+	m_drawnTex->Bind();
 }

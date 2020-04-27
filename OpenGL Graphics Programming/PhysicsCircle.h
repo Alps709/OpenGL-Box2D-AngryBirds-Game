@@ -20,6 +20,7 @@ public:
 	//Getters
 	b2Body* GetBody() { return m_body; }
 	float GetRadius() { return m_radius; }
+	std::string GetTag() { return m_tag; }
 
 protected:
 	b2World* m_world = nullptr;
@@ -28,6 +29,8 @@ protected:
 	glm::vec2 m_position{ 0.0f, 0.0f };
 	float m_rotationZ = 0.0f;
 	float m_radius = 1.0f;
+
+	std::string m_tag = "Circle";
 };
 
 

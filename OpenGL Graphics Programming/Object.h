@@ -20,12 +20,15 @@ public:
 	//Setters
 	void SetPosition(glm::vec2 _pos);
 	void SetTexture0(Texture* _tex);
-	/*void SetTexture1(Texture* _tex);*/
+	void SetTexture1(Texture* _tex);
+	void SetDrawnTex(int _texNum);
 
 	//Getters
 	Mesh GetMesh() const { return m_mesh; }
 	glm::mat4 GetModelMat() const { return m_modelMat; }
 	virtual double GetRadius() const { return m_colliderRadius; };
+	Texture* GetTexture0() { return m_tex0; }
+	Texture* GetTexture1() { return m_tex1; }
 
 	//Change m_position, rotation and m_scale
 	void ChangePRS(float _translateX, float _translateY, float _rotationAngle, float _scaleX, float _scaleY);
@@ -37,7 +40,7 @@ public:
 	//Render is overidden by all derived classes, but can still be used for a base object
 	virtual void Render(Camera& _myCamera);
 
-	void BindTexture(unsigned int _texNum) const;
+	void BindTexture() const;
 
 protected:
 	glm::vec2 m_position{ 0.0f, 0.0f };
@@ -49,7 +52,8 @@ protected:
 
 	Mesh m_mesh;
 	Shader m_shader;
+	Texture* m_drawnTex;
 	Texture* m_tex0;
-	//Texture* m_tex1{};
+	Texture* m_tex1;
 };
 

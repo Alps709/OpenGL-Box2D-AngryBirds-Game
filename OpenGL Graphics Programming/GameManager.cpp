@@ -22,6 +22,11 @@ GameManager::GameManager()
 	//Texture for the main angry boid
 	m_angryBoidTexture = new Texture("Resources/Images/RedBird.png", 0);
 
+	//Texture for the piggie
+	m_piggieTexture = new Texture("Resources/Images/Piggie.png", 0);
+	//Texture for the dead piggie
+	m_piggieTexture1 = new Texture("Resources/Images/PiggieHurt.png", 0);
+
 	//Create 1 background object
 	m_backgroundObject = Object(m_backgroundMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
 	m_backgroundObject.SetTexture0(m_backgroundTexture);
@@ -39,6 +44,8 @@ GameManager::GameManager()
 	//Create the world with the specified gravity
 	m_World = std::make_unique<b2World>(m_gravity);
 
+	m_World->SetContactListener(&m_collisionListener);
+
 	//Make the empty ground body used for the mousejoint
 	b2BodyDef bodyDef;
 	m_groundBody = m_World->CreateBody(&bodyDef);
@@ -55,18 +62,23 @@ GameManager::GameManager()
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-	std::shared_ptr<AngryBoid> tempBoid = std::make_shared<AngryBoid>(m_World.get(), m_boidFirePos, 25.0f, 25.0f);
-	tempBoid->SetTexture0(m_angryBoidTexture);
-	tempBoid->SetFireable(true);
-	m_angryBoids.push_back(tempBoid);
+	m_angryBoids.push_back(std::move(std::make_shared<AngryBoid>(m_World.get(), m_boidFirePos, 25.0f, 25.0f)));
+	m_angryBoids.back()->SetTexture0(m_angryBoidTexture);
+	m_angryBoids.back()->SetFireable(true);
 
 	for (int i = 0; i < 3; i++)
 	{
 		//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-		std::shared_ptr<AngryBoid> tempBoid = std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-inputManager.HSCREEN_WIDTH + 100 + (100 * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f);
-		tempBoid->SetTexture0(m_angryBoidTexture);
-		m_angryBoids.push_back(tempBoid);
+		m_angryBoids.push_back(std::move(std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-inputManager.HSCREEN_WIDTH + 100 + (100 * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
+		m_angryBoids.back()->SetTexture0(m_angryBoidTexture);
+		m_angryBoids.back()->SetFireable(true);
 	}
+
+	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
+	m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(400.0f, 40.0f), 25.0f, 25.0f)));
+	m_piggies.back()->SetTexture0(m_piggieTexture);
+	m_piggies.back()->SetTexture1(m_piggieTexture1);
+	m_piggies.back()->SetFireable(true);
 
 	//Create 1 seesaw joint
 	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(400.0f, 0.0f), glm::vec2(300.0f, 20.0f), 10.0f);
@@ -224,17 +236,24 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 			pBox->SetPRS(boxPos.x, boxPos.y, glm::degrees(pBox->GetBody()->GetAngle()), boxSize.x, boxSize.y);
 		}
 
-		for (auto& pCircle : m_angryBoids)
+		for (auto& pBoid : m_angryBoids)
 		{
-			glm::vec2 circlePos = Math::Box2DtoVec2(pCircle->GetBody()->GetPosition());
-			float circleRadius = pCircle->GetRadius();
-			pCircle->SetPRS(circlePos.x, circlePos.y, glm::degrees(pCircle->GetBody()->GetAngle()), circleRadius * 2.0f, circleRadius * 2.0f);
+			glm::vec2 boidPos = Math::Box2DtoVec2(pBoid->GetBody()->GetPosition());
+			float boidRadius = pBoid->GetRadius();
+			pBoid->SetPRS(boidPos.x, boidPos.y, glm::degrees(pBoid->GetBody()->GetAngle()), boidRadius * 2.0f, boidRadius * 2.0f);
+		}
+
+		for (auto& pPiggie : m_piggies)
+		{
+			glm::vec2 piggiePos = Math::Box2DtoVec2(pPiggie->GetBody()->GetPosition());
+			float piggieRadius = pPiggie->GetRadius();
+			pPiggie->SetPRS(piggiePos.x, piggiePos.y, glm::degrees(pPiggie->GetBody()->GetAngle()), piggieRadius * 2.0f, piggieRadius * 2.0f);
 		}
 
 		MoveNextFireableBoid();
 
 		//Update physics simulation only during play
-		m_World->Step(1.0f / 60.0f, 12, 12);
+		m_World->Step(1.0f / 60.0f, 6, 6);
 	}
 
 	//Update sounds
@@ -267,6 +286,11 @@ void GameManager::Render()
 		for (auto& pBoid : m_angryBoids)
 		{
 			pBoid->Render(*m_camera);
+		}
+
+		for (auto& pPiggie : m_piggies)
+		{
+			pPiggie->Render(*m_camera);
 		}
 
 		if (m_drawLine)
@@ -323,6 +347,15 @@ void GameManager::Reset()
 		angryBoid->GetBody()->SetType(b2_staticBody);
 
 		i++;
+	}
+
+	for (auto piggie : m_piggies)
+	{
+
+		piggie->GetBody()->SetTransform(Math::Vec2toBox2D(piggie->GetOriginalPosition()), 0.0f);
+		piggie->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		piggie->GetBody()->SetAngularVelocity(0.0f);
+		piggie->GetBody()->SetAwake(true);
 	}
 
 	m_physicsSeesaw->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(400.0f, 0.0f)), 0.0f);
@@ -384,7 +417,12 @@ void GameManager::CheckMouseToBoidCollisions()
 	if (m_leftMBDown && m_mouseJoint)
 	{
 		//Update the target to the new mouse pos
-		b2Vec2 newPos = Math::Vec2toBox2D(glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY));
+		glm::vec2 vecToMouse = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY) - m_leftMouseDownPos;
+		if (glm::length(vecToMouse) > 500.0f)
+		{
+			Math::LimitVector2D(vecToMouse, 500.0f);
+		}
+		b2Vec2 newPos = Math::Vec2toBox2D(m_leftMouseDownPos + vecToMouse);
 		m_mouseJoint->SetTarget(newPos);
 
 

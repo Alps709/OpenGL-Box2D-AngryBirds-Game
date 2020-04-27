@@ -6,8 +6,9 @@
 #include "clock.h"
 #include "PhysicsBox.h"
 #include "AngryBoid.h"
+#include "Piggie.h"
 #include "PhysicsSeesaw.h"
-#include <box2d.h>
+#include "Box2DCollisionListener.h"
 
 #include <fmod.hpp>
 
@@ -71,6 +72,7 @@ private:
 
 	//Box 2D stuff
 	std::unique_ptr<b2World> m_World;
+	Box2DCollisionListener m_collisionListener;
 	b2Vec2 m_gravity = { 0.0, -1.0 };
 
 	//Used for moving the angry boid when clicked on
@@ -89,7 +91,7 @@ private:
 	std::shared_ptr <PhysicsSeesaw> m_physicsSeesaw;
 	std::vector<std::shared_ptr<PhysicsBox>> m_physicsBoxes;
 	std::vector< std::shared_ptr<AngryBoid>> m_angryBoids;
-	std::vector< std::shared_ptr<PhysicsCircle>> m_piggies;
+	std::vector< std::shared_ptr<Piggie>> m_piggies;
 
 	//Used for dragging and shooting the boids
 	AngryBoid* m_selectedBoid = nullptr;
@@ -112,10 +114,13 @@ private:
 	//Game Background
 	Object m_backgroundObject;
 	Mesh m_backgroundMesh;
-	Texture* m_backgroundTexture;
 
-	//Circle Texture
+
+	//Textures
+	Texture* m_backgroundTexture;
 	Texture* m_angryBoidTexture;
+	Texture* m_piggieTexture;
+	Texture* m_piggieTexture1;
 
 	//Default shader
 	Shader m_defaultShader;
