@@ -8,7 +8,7 @@ void Box2DCollisionListener::BeginContact(b2Contact* _contact)
 	auto tempA = _contact->GetFixtureA()->GetBody();
 	auto tempB = _contact->GetFixtureB()->GetBody();
 
-	//Convert the tag to a string pointer, if it's not null get the tag string
+	//Convert the user data from a void*, if it's not null then get the user data
 	PhysicsObjectData* tagA = (PhysicsObjectData*)tempA->GetUserData() == nullptr ? nullptr : (PhysicsObjectData*)tempA->GetUserData();
 	PhysicsObjectData* tagB = (PhysicsObjectData*)tempB->GetUserData() == nullptr ? nullptr : (PhysicsObjectData*)tempB->GetUserData();
 
@@ -17,27 +17,21 @@ void Box2DCollisionListener::BeginContact(b2Contact* _contact)
 		std::string tagAS = tagA->m_tag;
 		std::string tagBS = tagB->m_tag;
 
-		if (tagAS == "Piggie")
-		{
-			std::cout << "Hit Piggie" << std::endl;
-		}
-		if (tagBS == "Piggie")
-		{
-			std::cout << "Hit Piggie" << std::endl;
-		}
-
 		if (tagAS == "AngryBoid" && tagBS == "Piggie")
 		{
-			std::cout << "Piggie killed!" << std::endl;
+			//Set the drawn texture of the piggie to be the dead piggie
 			*(tagB->m_ptrToDrawnTex) = tagB->m_tex1;
+			//Set bool to tell that piggie died
+			*(tagB->m_hasDied) = true;
 		}
 		else if (tagAS == "Piggie" && tagBS == "AngryBoid")
 		{
-			std::cout << "Piggie killed!" << std::endl;
+			//Set the drawn texture of the piggie to be the dead piggie
 			*(tagA->m_ptrToDrawnTex) = tagA->m_tex1;
+			//Set bool to tell that piggie died
+			*(tagA->m_hasDied) = true;
 		}
 	}
-	//tempB->ApplyLinearImpulseToCenter(Math::Vec2toBox2D(glm::vec2(0.0f, 100.0f * tempB->GetMass())), true);
 }
 
 void Box2DCollisionListener::EndContact(b2Contact* _contact)
@@ -66,20 +60,28 @@ void Box2DCollisionListener::PostSolve(b2Contact* _contact, const b2ContactImpul
 
 		if (tagAS == "Box" && tagBS == "Piggie")
 		{
+			//If a box hits a piggie with an impulse greater than 2.5, then the box kills the piggie :(
 			if (_impulse->normalImpulses[0] > 2.5f)
 			{
 				std::cout << "Piggie killed!" << std::endl;
 
+				//Change the drawn texture to the dead piggie texture
 				*(tagB->m_ptrToDrawnTex) = tagB->m_tex1;
+
+				//Set bool to tell that piggie died
+				*(tagB->m_hasDied) = true;
 			}
 		}
 		else if (tagAS == "Piggie" && tagBS == "Box")
 		{
+			//If a box hits a piggie with an impulse greater than 2.5, then the box kills the piggie :(
 			if (_impulse->normalImpulses[0] > 2.5f)
 			{
-				std::cout << "Piggie killed!" << std::endl;
-
+				//Set the drawn texture of the piggie to be the dead piggie
 				*(tagA->m_ptrToDrawnTex) = tagA->m_tex1;
+
+				//Set bool to tell that piggie died
+				*(tagB->m_hasDied) = true;
 			}
 		}
 	}

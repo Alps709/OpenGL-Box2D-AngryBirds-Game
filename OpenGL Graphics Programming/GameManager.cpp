@@ -83,7 +83,7 @@ GameManager::GameManager()
 	for (int i = 0; i < 3; i++)
 	{
 		//Create 3 piggies
-		m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(400.0f, 40.0f), 25.0f, 25.0f)));
+		m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(inputManager.HSCREEN_WIDTH - 50.0f - (150.0f * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
 		m_piggies.back()->SetTexture0(m_piggieTexture);
 		m_piggies.back()->SetTexture1(m_piggieTexture1);
 		m_piggies.back()->SetFireable(true);
@@ -255,12 +255,16 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 		for (auto& pPiggie : m_piggies)
 		{
-			glm::vec2 piggiePos = Math::Box2DtoVec2(pPiggie->GetBody()->GetPosition());
-			float piggieRadius = pPiggie->GetRadius();
-			pPiggie->SetPRS(piggiePos.x, piggiePos.y, glm::degrees(pPiggie->GetBody()->GetAngle()), piggieRadius * 2.0f, piggieRadius * 2.0f);
+			if (pPiggie->GetBody()->IsEnabled())
+			{
+				glm::vec2 piggiePos = Math::Box2DtoVec2(pPiggie->GetBody()->GetPosition());
+				float piggieRadius = pPiggie->GetRadius();
+				pPiggie->SetPRS(piggiePos.x, piggiePos.y, glm::degrees(pPiggie->GetBody()->GetAngle()), piggieRadius * 2.0f, piggieRadius * 2.0f);
+			}
 		}
 
 		MoveNextFireableBoid();
+		RemoveDeadPiggies();
 
 		//Update physics simulation only during play
 		m_World->Step(1.0f / 60.0f, 6, 6);
@@ -300,7 +304,10 @@ void GameManager::Render()
 
 		for (auto& pPiggie : m_piggies)
 		{
-			pPiggie->Render(*m_camera);
+			if (pPiggie->GetBody()->IsEnabled())
+			{
+				pPiggie->Render(*m_camera);
+			}
 		}
 
 		if (m_drawLine)
@@ -361,11 +368,15 @@ void GameManager::Reset()
 
 	for (auto piggie : m_piggies)
 	{
+		auto piggieBody = piggie->GetBody();
+		piggieBody->SetEnabled(true);
+		piggieBody->SetTransform(Math::Vec2toBox2D(piggie->GetOriginalPosition()), 0.0f);
+		piggieBody->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		piggieBody->SetAngularVelocity(0.0f);
+		piggieBody->SetAwake(true);
 		piggie->SetDrawnTex(0);
-		piggie->GetBody()->SetTransform(Math::Vec2toBox2D(piggie->GetOriginalPosition()), 0.0f);
-		piggie->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-		piggie->GetBody()->SetAngularVelocity(0.0f);
-		piggie->GetBody()->SetAwake(true);
+		piggie->SetTimeOfDeath(0.0);
+		piggie->SetIsDead(false);
 	}
 
 	m_physicsSeesaw->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(400.0f, 0.0f)), 0.0f);
@@ -377,6 +388,7 @@ void GameManager::CheckMouseToBoidCollisions()
 	//If the left mouse button was clicked this frame and there is no mouse joint
 	if (inputManager.MouseState[0] == INPUT_DOWN_FIRST && !m_mouseJoint)
 	{
+		//If clicked on a boid that can be fire create a mouse joint
 		for (auto& angryBoid : m_angryBoids)
 		{
 			//If the current boid can't be fired skip it
@@ -428,10 +440,10 @@ void GameManager::CheckMouseToBoidCollisions()
 	{
 		//Update the target to the new mouse pos
 		glm::vec2 vecToMouse = glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY) - m_leftMouseDownPos;
-		/*if (glm::length(vecToMouse) > 500.0f)
+		if (glm::length(vecToMouse) > 400.0f)
 		{
-			Math::LimitVector2D(vecToMouse, 500.0f);
-		}*/
+			Math::LimitVector2D(vecToMouse, 400.0f);
+		}
 		b2Vec2 newPos = Math::Vec2toBox2D(m_leftMouseDownPos + vecToMouse);
 		m_mouseJoint->SetTarget(newPos);
 
@@ -443,10 +455,10 @@ void GameManager::CheckMouseToBoidCollisions()
 
 		//Calculate the shoot line 
 		m_drawLine = true;
-		m_shootLinePoint1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1.0, 1.0);
+		m_shootLinePoint1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH,  inputManager.HSCREEN_WIDTH,  -1.0, 1.0);
 		m_shootLinePoint2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
-		auto temp1        = Math::remap(    m_leftMouseDownPos.x, -inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -1.0, 1.0);
-		auto temp2        = Math::remap(    m_leftMouseDownPos.y, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
+		auto temp1        = Math::remap(m_leftMouseDownPos.x,     -inputManager.HSCREEN_WIDTH,  inputManager.HSCREEN_WIDTH,  -1.0, 1.0);
+		auto temp2        = Math::remap(m_leftMouseDownPos.y,     -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
 		m_shootLinePoint3 = (temp1 - m_shootLinePoint1) * 2.0f;
 		m_shootLinePoint4 = (temp2 - m_shootLinePoint2) * 2.0f;
 	}
@@ -518,6 +530,33 @@ void GameManager::MoveNextFireableBoid()
 		m_nextBoidToFire->GetBody()->SetTransform(Math::Vec2toBox2D(m_boidFirePos), 0.0f);
 		m_nextBoidToFire->SetFireable(true);
 		m_nextBoidToFire = nullptr;
+	}
+}
+
+void GameManager::RemoveDeadPiggies()
+{
+	for (auto& piggie : m_piggies)
+	{
+		if (piggie->GetIsDead())
+		{
+			//If the piggie has only just died set the time of death
+			if (!(piggie->GetTimeOfDeath() > 0.0))
+			{
+				piggie->SetTimeOfDeath(m_clock.GetTimeElapsedS());
+			}
+			else
+			{
+				//If piggie has been dead for 2 seconds now
+				if (piggie->GetBody()->IsEnabled() && m_clock.GetTimeElapsedS() - piggie->GetTimeOfDeath() > 2.0)
+				{
+					//Disable the piggies body
+					auto tempRef = piggie->GetBody();
+					//tempRef->SetTransform(Math::Vec2toBox2D(glm::vec2(1000.0f, 1000.0f)), 0.0f);
+					tempRef->SetEnabled(false);
+				}
+			}
+		}
+
 	}
 }
 

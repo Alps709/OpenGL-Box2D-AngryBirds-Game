@@ -40,7 +40,11 @@ public:
 	//Handle what happens when the player clicks on a boid
 	void CheckMouseToBoidCollisions();
 
+	//Move the next boid into the firing position
 	void MoveNextFireableBoid();
+
+	//Remove piggies that have been dead for a while
+	void RemoveDeadPiggies();
 
 	//Create the physical screen borders for the box 2d world
 	void CreateScreenBorderWalls();
