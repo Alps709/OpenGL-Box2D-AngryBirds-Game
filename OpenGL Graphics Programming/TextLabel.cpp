@@ -7,8 +7,8 @@ TextLabel::TextLabel(const std::string& _text, const std::string& _font, glm::ve
 	m_colour = _colour;
 	m_scale = _scale;
 
-	GLfloat halfWidth = static_cast<GLfloat>(inputManager.SCREEN_WIDTH) * 0.5f;
-	GLfloat halfHeight = static_cast<GLfloat>(inputManager.SCREEN_HEIGHT) * 0.5f;
+	GLfloat halfWidth = static_cast<GLfloat>(inputManager.GL_SCREEN_WIDTH) * 0.5f;
+	GLfloat halfHeight = static_cast<GLfloat>(inputManager.GL_SCREEN_HEIGHT) * 0.5f;
 
 	m_projMat = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight);
 

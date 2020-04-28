@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition(100, 100);
-	glutInitWindowSize((int)inputManager.SCREEN_WIDTH, (int)inputManager.SCREEN_HEIGHT);
+	glutInitWindowSize((int)inputManager.GL_SCREEN_WIDTH, (int)inputManager.GL_SCREEN_HEIGHT);
 	glutCreateWindow("The Snek Game - By Anton Le Prevost-Smith");
 
 	//Print openGL version

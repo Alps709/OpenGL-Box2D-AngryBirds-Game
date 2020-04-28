@@ -8,7 +8,7 @@ Camera::Camera(bool _isOrthoView)
 	m_worldUp(glm::vec3{ 0.0f, 1.0f, 0.0f }), 
 	m_camYaw(-90.0f), m_camPitch(0), m_camRoll(0), m_camSpeed(5), m_mouseSens(1.0f),
 	m_viewMat(glm::lookAt(m_camPosition, m_camPosition + m_camLookDir, m_worldUp)),
-	m_orthoProjectionMat(glm::ortho(-inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_WIDTH, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -10000.0f, 10000.0f)),
+	m_orthoProjectionMat(glm::ortho(-inputManager.GL_HSCREEN_WIDTH, inputManager.GL_HSCREEN_WIDTH, -inputManager.GL_HSCREEN_HEIGHT, inputManager.GL_HSCREEN_HEIGHT, -10000.0f, 10000.0f)),
 	m_perspectiveProjectionMat(glm::perspective(glm::radians(90.0f), 960.0f/540.0f, 0.1f, 10.0f))
 {
 	UpdateVectors();

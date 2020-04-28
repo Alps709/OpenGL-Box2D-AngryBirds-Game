@@ -32,7 +32,7 @@ GameManager::GameManager()
 	//Create the text objects
 	m_menuTitleText = std::make_shared<TextLabel>("The Angry Boid Game!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 	m_menuInstructText = std::make_shared<TextLabel>("Press enter to play", "Resources/Fonts/Arial.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
-	m_gameScoreText = std::make_shared<TextLabel>("Score: ", "Resources/Fonts/Arial.ttf", glm::vec2(-inputManager.HSCREEN_WIDTH + 40.0f, inputManager.HSCREEN_HEIGHT - 40.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1.0f);
+	m_gameScoreText = std::make_shared<TextLabel>("Score: ", "Resources/Fonts/Arial.ttf", glm::vec2(-inputManager.GL_HSCREEN_WIDTH + 40.0f, inputManager.GL_HSCREEN_HEIGHT - 40.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1.0f);
 	m_gameOverTitleText = std::make_shared<TextLabel>("Game over!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 	m_gameOverInstructText = std::make_shared<TextLabel>("Press enter to play again!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 
@@ -54,13 +54,13 @@ GameManager::GameManager()
 	// Make the screen borders
 	CreateScreenBorderWalls();
 	
-	//Create 10 boxes in the level (the last 5 of them are destructable)
+	//Create 15 boxes in the level (the first 9 of them are destructable)
 	for (int i = 0; i < 15; i++)
 	{
 		glm::vec2 size = glm::vec2(40.0f, 40.0f);
 		if (i >= 10) size = glm::vec2(50.0f, 50.0f);
 
-		m_physicsBoxes.push_back(std::move(std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 40.0f + (((i >= 10)? 45 : 40) * i)), size, 10.0f)));
+		m_physicsBoxes.push_back(std::move(std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.GL_HSCREEN_HEIGHT  + 40.0f + (((i >= 10)? 45 : 40) * i)), size, 10.0f)));
 		m_physicsBoxes.back()->SetTexture0(m_boxTexture);
 		m_physicsBoxes.back()->SetTexture1(m_damagedBoxTexture);
 
@@ -80,7 +80,7 @@ GameManager::GameManager()
 	for (int i = 0; i < 3; i++)
 	{
 		//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
-		m_angryBoids.push_back(std::move(std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-inputManager.HSCREEN_WIDTH + 100 + (100 * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
+		m_angryBoids.push_back(std::move(std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-inputManager.GL_HSCREEN_WIDTH + 100 + (100 * i), -inputManager.GL_HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
 		m_angryBoids.back()->SetTexture0(m_angryBoidTexture);
 		m_angryBoids.back()->SetFireable(false);
 	}
@@ -94,7 +94,7 @@ GameManager::GameManager()
 	for (int i = 0; i < 3; i++)
 	{
 		//Create 3 piggies
-		m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(inputManager.HSCREEN_WIDTH - 50.0f - (150.0f * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
+		m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(inputManager.GL_HSCREEN_WIDTH - 50.0f - (150.0f * i), -inputManager.GL_HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
 		m_piggies.back()->SetTexture0(m_piggieTexture);
 		m_piggies.back()->SetTexture1(m_piggieTexture1);
 		m_piggies.back()->SetUserData();
@@ -507,12 +507,13 @@ void GameManager::CheckMouseToBoidCollisions()
 
 		//Calculate the shoot line 
 		m_drawLine = true;
-		m_shootLinePoint1 = Math::remap(inputManager.g_mousePosX, -inputManager.HSCREEN_WIDTH,  inputManager.HSCREEN_WIDTH,  -1.0, 1.0);
-		m_shootLinePoint2 = Math::remap(inputManager.g_mousePosY, -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
-		auto temp1        = Math::remap(m_leftMouseDownPos.x,     -inputManager.HSCREEN_WIDTH,  inputManager.HSCREEN_WIDTH,  -1.0, 1.0);
-		auto temp2        = Math::remap(m_leftMouseDownPos.y,     -inputManager.HSCREEN_HEIGHT, inputManager.HSCREEN_HEIGHT, -1.0, 1.0);
-		m_shootLinePoint3 = (temp1 - m_shootLinePoint1) * 2.0f;
-		m_shootLinePoint4 = (temp2 - m_shootLinePoint2) * 2.0f;
+		m_shootLinePoint1 = Math::remap(inputManager.g_mousePosX, -inputManager.GL_HSCREEN_WIDTH,  inputManager.GL_HSCREEN_WIDTH,  -1.0, 1.0);
+		m_shootLinePoint2 = Math::remap(inputManager.g_mousePosY, -inputManager.GL_HSCREEN_HEIGHT, inputManager.GL_HSCREEN_HEIGHT, -1.0, 1.0);
+		auto temp1        = Math::remap(m_leftMouseDownPos.x,     -inputManager.GL_HSCREEN_WIDTH,  inputManager.GL_HSCREEN_WIDTH,  -1.0, 1.0);
+		auto temp2        = Math::remap(m_leftMouseDownPos.y,     -inputManager.GL_HSCREEN_HEIGHT, inputManager.GL_HSCREEN_HEIGHT, -1.0, 1.0);
+		glm::vec2 tempPos = glm::vec2(temp1, temp2) - glm::vec2(m_shootLinePoint1, m_shootLinePoint2);
+		m_shootLinePoint3 = tempPos.x;
+		m_shootLinePoint4 = tempPos.y;
 	}
 
 	//If the mouse has been released and the mouse joint exists
@@ -654,47 +655,47 @@ void GameManager::RemoveDamagedBoxes()
 void GameManager::CreateScreenBorderWalls()
 {
 	//Ground border
-	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -inputManager.SCREEN_HEIGHT));
+	b2Vec2 tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, -inputManager.GL_SCREEN_HEIGHT));
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(tempPos.x, tempPos.y);
 	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
 
 	//Make the ground fixture
-	auto tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
+	auto tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.GL_HSCREEN_WIDTH, inputManager.GL_HSCREEN_HEIGHT));
 	b2PolygonShape groundBox;
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Left wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(-inputManager.SCREEN_WIDTH, 00.0f));
+	tempPos = Math::Vec2toBox2D(glm::vec2(-inputManager.GL_SCREEN_WIDTH, 00.0f));
 	b2BodyDef leftWallBody;
 	leftWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&leftWallBody);
 
 	// Make the fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
+	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.GL_HSCREEN_WIDTH, inputManager.GL_HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Right wall border
-	tempPos = Math::Vec2toBox2D(glm::vec2(inputManager.SCREEN_WIDTH, 0.0f));
+	tempPos = Math::Vec2toBox2D(glm::vec2(inputManager.GL_SCREEN_WIDTH, 0.0f));
 	b2BodyDef rightWallBody;
 	rightWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&rightWallBody);
 
 	// Make the fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
+	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.GL_HSCREEN_WIDTH, inputManager.GL_HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 
 	//Ground border
-	tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, inputManager.SCREEN_HEIGHT));
+	tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, inputManager.GL_SCREEN_HEIGHT));
 	b2BodyDef roofBodyDef;
 	roofBodyDef.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&roofBodyDef);
 
 	// Make the ground fixture
-	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
+	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.GL_HSCREEN_WIDTH, inputManager.GL_HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
 }

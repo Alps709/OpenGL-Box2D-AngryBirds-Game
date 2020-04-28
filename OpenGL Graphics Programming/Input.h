@@ -23,10 +23,11 @@ namespace
 
 	void MouseClick(int _button, int _state, int _x, int _y)
 	{
+		//Convert current screen width and height mouse co-ords to 
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
-		_x = (int)(Math::remap(_x, -inputManagerI.TRUE_HSCREEN_WIDTH, inputManagerI.TRUE_HSCREEN_WIDTH, -inputManagerI.HSCREEN_WIDTH, inputManagerI.HSCREEN_WIDTH) - inputManagerI.HSCREEN_WIDTH);
-		_y = (int)(Math::remap(_y, -inputManagerI.TRUE_HSCREEN_HEIGHT, inputManagerI.TRUE_HSCREEN_HEIGHT, -inputManagerI.HSCREEN_HEIGHT, inputManagerI.HSCREEN_HEIGHT) - inputManagerI.HSCREEN_HEIGHT);
-
+		//(remaps screen size mouse coords to opengl pixel coords)
+		_x = (int)Math::remap(_x, 0.0, inputManagerI.WINDOW_SCREEN_WIDTH, -inputManagerI.GL_HSCREEN_WIDTH, inputManagerI.GL_HSCREEN_WIDTH);
+		_y = (int)Math::remap(_y, 0.0, inputManagerI.WINDOW_SCREEN_HEIGHT, -inputManagerI.GL_HSCREEN_HEIGHT, inputManagerI.GL_HSCREEN_HEIGHT);
 		//Invert y axis
 		_y *= -1;
 
@@ -54,8 +55,8 @@ namespace
 		//Convert current screen width and height mouse co-ords to 
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
 		//(remaps screen size mouse coords to opengl pixel coords)
-		_x = (int)(Math::remap(_x, -inputManagerI.TRUE_HSCREEN_WIDTH, inputManagerI.TRUE_HSCREEN_WIDTH, -inputManagerI.HSCREEN_WIDTH, inputManagerI.HSCREEN_WIDTH) - inputManagerI.HSCREEN_WIDTH);
-		_y = (int)(Math::remap(_y, -inputManagerI.TRUE_HSCREEN_HEIGHT, inputManagerI.TRUE_HSCREEN_HEIGHT, -inputManagerI.HSCREEN_HEIGHT, inputManagerI.HSCREEN_HEIGHT) - inputManagerI.HSCREEN_HEIGHT);
+		_x = (int)Math::remap(_x, 0.0, inputManagerI.WINDOW_SCREEN_WIDTH, -inputManagerI.GL_HSCREEN_WIDTH, inputManagerI.GL_HSCREEN_WIDTH);
+		_y = (int)Math::remap(_y, 0.0, inputManagerI.WINDOW_SCREEN_HEIGHT, -inputManagerI.GL_HSCREEN_HEIGHT, inputManagerI.GL_HSCREEN_HEIGHT);
 
 		//Invert y axis
 		_y *= -1;
@@ -73,8 +74,8 @@ namespace
 		//Convert current screen width and height mouse co-ords to 
 		//Move co-ords from (0, 0) at top left, to (0, 0) at middle of screen
 		//(remaps screen size mouse coords to opengl pixel coords)
-		_x = (int)(Math::remap(_x, -inputManagerI.TRUE_HSCREEN_WIDTH, inputManagerI.TRUE_HSCREEN_WIDTH, -inputManagerI.HSCREEN_WIDTH, inputManagerI.HSCREEN_WIDTH) - inputManagerI.HSCREEN_WIDTH);
-		_y = (int)(Math::remap(_y, -inputManagerI.TRUE_HSCREEN_HEIGHT, inputManagerI.TRUE_HSCREEN_HEIGHT, -inputManagerI.HSCREEN_HEIGHT, inputManagerI.HSCREEN_HEIGHT) - inputManagerI.HSCREEN_HEIGHT);
+		_x = (int)Math::remap(_x, 0.0, inputManagerI.WINDOW_SCREEN_WIDTH, -inputManagerI.GL_HSCREEN_WIDTH, inputManagerI.GL_HSCREEN_WIDTH);
+		_y = (int)Math::remap(_y, 0.0, inputManagerI.WINDOW_SCREEN_HEIGHT, -inputManagerI.GL_HSCREEN_HEIGHT, inputManagerI.GL_HSCREEN_HEIGHT);
 
 		//Invert y axis
 		_y *= -1;
@@ -157,11 +158,11 @@ namespace
 
 	void WindowResize(int _x, int _y)
 	{
-		inputManagerI.TRUE_SCREEN_WIDTH = (float)_x;
-		inputManagerI.TRUE_SCREEN_HEIGHT = (float)_y;
-		inputManagerI.TRUE_HSCREEN_HEIGHT = inputManagerI.TRUE_SCREEN_HEIGHT / 2;
-		inputManagerI.TRUE_HSCREEN_WIDTH = inputManagerI.TRUE_SCREEN_WIDTH / 2;
+		inputManagerI.WINDOW_SCREEN_WIDTH = (float)_x;
+		inputManagerI.WINDOW_SCREEN_HEIGHT = (float)_y;
+		inputManagerI.WINDOW_HSCREEN_HEIGHT = inputManagerI.WINDOW_SCREEN_HEIGHT / 2;
+		inputManagerI.WINDOW_HSCREEN_WIDTH = inputManagerI.WINDOW_SCREEN_WIDTH / 2;
 
-		glViewport((GLsizei)0, (GLsizei)0, (GLsizei)inputManagerI.TRUE_SCREEN_WIDTH, (GLsizei)inputManagerI.TRUE_SCREEN_HEIGHT);
+		glViewport((GLsizei)0, (GLsizei)0, (GLsizei)inputManagerI.WINDOW_SCREEN_WIDTH, (GLsizei)inputManagerI.WINDOW_SCREEN_HEIGHT);
 	}
 }

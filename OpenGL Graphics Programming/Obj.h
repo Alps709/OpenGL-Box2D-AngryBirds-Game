@@ -25,10 +25,10 @@ namespace Objects
 	{
 		///Bottom right quad
 		//Position			     //Colour			        //Texture co-ords
-		-inputManagerO.HSCREEN_WIDTH, -inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f,    //Bottom left
-		-inputManagerO.HSCREEN_WIDTH,  inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    //Top left
-		 inputManagerO.HSCREEN_WIDTH,  inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    //Top right
-		 inputManagerO.HSCREEN_WIDTH, -inputManagerO.HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    //Bottom right
+		-inputManagerO.GL_HSCREEN_WIDTH, -inputManagerO.GL_HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 1.0f,    //Bottom left
+		-inputManagerO.GL_HSCREEN_WIDTH,  inputManagerO.GL_HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   0.0f, 0.0f,    //Top left
+		 inputManagerO.GL_HSCREEN_WIDTH,  inputManagerO.GL_HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 0.0f,    //Top right
+		 inputManagerO.GL_HSCREEN_WIDTH, -inputManagerO.GL_HSCREEN_HEIGHT, 0.0f,	 1.0f, 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,    //Bottom right
 	};
 
 	static std::vector<unsigned int> indicesBackground =
