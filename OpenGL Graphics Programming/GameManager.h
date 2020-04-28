@@ -20,14 +20,6 @@ enum GameState
 	GAME_OVER = 2,
 };
 
-enum GameplayState
-{
-	PLAY_SEEK = 0,
-	PLAY_ARRIVE = 1,
-	PLAY_FOLLOWPATH = 2,
-	PLAY_FLOCK = 3
-};
-
 class GameManager
 {
 public:
@@ -46,10 +38,14 @@ public:
 	//Remove piggies that have been dead for a while
 	void RemoveDeadPiggies();
 
+	//Remove boxes that have been damaged for a while
+	void RemoveDamagedBoxes();
+
 	//Create the physical screen borders for the box 2d world
 	void CreateScreenBorderWalls();
 
 	void Update(int _mousePosX, int _mousePosY);
+	void UpdateGameState();
 	void Render();
 	void Clear();
 
@@ -67,6 +63,8 @@ private:
 
 	//Game variables
 	unsigned int m_gameScore = 0;
+	unsigned int m_piggiesAlive = 4;
+	unsigned int m_boidsLeft = 4;
 	
 	//Clock
 	CClock m_clock;
@@ -100,9 +98,11 @@ private:
 	//Used for dragging and shooting the boids
 	AngryBoid* m_selectedBoid = nullptr;
 	AngryBoid* m_nextBoidToFire = nullptr;
+	AngryBoid* m_lastSelectedBoid = nullptr;
 
 	//Used to wait for a certain amount before moving the next boid to the firing position
 	double m_timeOfLastFiredBoid = 0.0;
+	double m_timeOfLastPiggieDeath = 0.0;
 
 	//The position that a boid will move to when it can be fired
 	glm::vec2 m_boidFirePos = glm::vec2(-400.0f, -100.0f);
@@ -114,25 +114,30 @@ private:
 	double m_shootLinePoint3;
 	double m_shootLinePoint4;
 
-
 	//Game Background
 	Object m_backgroundObject;
 	Mesh m_backgroundMesh;
 
 
 	//Textures
-	Texture* m_backgroundTexture;
+	Texture* m_boxTexture;
+	Texture* m_damagedBoxTexture;
 	Texture* m_angryBoidTexture;
 	Texture* m_piggieTexture;
 	Texture* m_piggieTexture1;
+
 
 	//Default shader
 	Shader m_defaultShader;
 
 	//Text
-	TextLabel* m_menuTitleText = nullptr;
-	TextLabel* m_menuInstructText = nullptr;
-	
+	std::shared_ptr <TextLabel> m_menuTitleText = nullptr;
+	std::shared_ptr <TextLabel> m_menuInstructText = nullptr;
+	std::shared_ptr <TextLabel> m_gameScoreText = nullptr;
+	std::shared_ptr <TextLabel> m_gameOverTitleText = nullptr;
+	std::shared_ptr <TextLabel> m_gameOverInstructText = nullptr;
+
+
 	//Audio
 	//inline static FMOD::System* m_audioSystem = nullptr;
 	//inline static FMOD::Sound* m_yeatSound = nullptr;

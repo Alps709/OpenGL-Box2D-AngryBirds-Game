@@ -14,25 +14,27 @@ GameManager::GameManager()
 	//Create defaut shader
 	m_defaultShader = Shader();
 
-	//Set background mesh and texture
-	m_backgroundMesh = Mesh(Objects::verticesBackground, Objects::indicesBackground);
-	m_backgroundTexture = new Texture("Resources/Images/Grass.png", 0);
-
+	
 	//Texture for the main angry boid
 	m_angryBoidTexture = new Texture("Resources/Images/RedBird.png", 0);
+
+	//Texture for box
+	m_boxTexture = new Texture("Resources/Images/Grass.png", 0);
+	//Texture for damaged box
+	m_damagedBoxTexture = new Texture("Resources/Images/GrassDamaged.png", 0);
+
 
 	//Texture for the piggie
 	m_piggieTexture = new Texture("Resources/Images/Piggie.png", 0);
 	//Texture for the dead piggie
 	m_piggieTexture1 = new Texture("Resources/Images/PiggieHurt.png", 0);
 
-	//Create 1 background object
-	m_backgroundObject = Object(m_backgroundMesh, m_defaultShader, glm::vec2(0.0f, 0.0f));
-	m_backgroundObject.SetTexture0(m_backgroundTexture);
-
 	//Create the text objects
-	m_menuTitleText = new TextLabel("The Angry Boid Game!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
-	m_menuInstructText = new TextLabel("Press enter to play", "Resources/Fonts/Arial.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
+	m_menuTitleText = std::make_shared<TextLabel>("The Angry Boid Game!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
+	m_menuInstructText = std::make_shared<TextLabel>("Press enter to play", "Resources/Fonts/Arial.ttf", glm::vec2(-600, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
+	m_gameScoreText = std::make_shared<TextLabel>("Score: ", "Resources/Fonts/Arial.ttf", glm::vec2(-inputManager.HSCREEN_WIDTH + 40.0f, inputManager.HSCREEN_HEIGHT - 40.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1.0f);
+	m_gameOverTitleText = std::make_shared<TextLabel>("Game over!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, 200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
+	m_gameOverInstructText = std::make_shared<TextLabel>("Press enter to play again!", "Resources/Fonts/Arial.ttf", glm::vec2(-625, -200), glm::vec3(0.0f, 1.0f, 1.0f), 2.0f);
 
 	//Create the camera
 	//Pass in true to say it is using an orthographic view
@@ -52,12 +54,22 @@ GameManager::GameManager()
 	// Make the screen borders
 	CreateScreenBorderWalls();
 	
-	//Create 10 boxes in the level
-	for (int i = 0; i < 10; i++)
+	//Create 10 boxes in the level (the last 5 of them are destructable)
+	for (int i = 0; i < 15; i++)
 	{
-		std::shared_ptr<PhysicsBox> tempBox = std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 75.0f * i), glm::vec2(50.0f, 50.0f), 10.0f);
-		tempBox->SetTexture0(m_backgroundTexture);
-		m_physicsBoxes.push_back(tempBox);
+		glm::vec2 size = glm::vec2(40.0f, 40.0f);
+		if (i >= 10) size = glm::vec2(50.0f, 50.0f);
+
+		m_physicsBoxes.push_back(std::move(std::make_shared<PhysicsBox>(m_World.get(), glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT  + 40.0f + (((i >= 10)? 45 : 40) * i)), size, 10.0f)));
+		m_physicsBoxes.back()->SetTexture0(m_boxTexture);
+		m_physicsBoxes.back()->SetTexture1(m_damagedBoxTexture);
+
+		if (i < 10)
+		{
+			m_physicsBoxes.back()->SetDestructable(true);
+		}
+
+		m_physicsBoxes.back()->SetUserData();
 	}
 
 	//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
@@ -70,14 +82,13 @@ GameManager::GameManager()
 		//Create 1 angry boid (the boid is using a generic PhysicsCircle class for now, I will make a proper angry bird class for the final submission)
 		m_angryBoids.push_back(std::move(std::make_shared<AngryBoid>(m_World.get(), glm::vec2(-inputManager.HSCREEN_WIDTH + 100 + (100 * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
 		m_angryBoids.back()->SetTexture0(m_angryBoidTexture);
-		m_angryBoids.back()->SetFireable(true);
+		m_angryBoids.back()->SetFireable(false);
 	}
 
 	//Create 1 piggie on the seesaw
 	m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(400.0f, 40.0f), 25.0f, 25.0f)));
 	m_piggies.back()->SetTexture0(m_piggieTexture);
 	m_piggies.back()->SetTexture1(m_piggieTexture1);
-	m_piggies.back()->SetFireable(true);
 	m_piggies.back()->SetUserData();
 
 	for (int i = 0; i < 3; i++)
@@ -86,13 +97,12 @@ GameManager::GameManager()
 		m_piggies.push_back(std::move(std::make_shared<Piggie>(m_World.get(), glm::vec2(inputManager.HSCREEN_WIDTH - 50.0f - (150.0f * i), -inputManager.HSCREEN_HEIGHT + 50), 25.0f, 25.0f)));
 		m_piggies.back()->SetTexture0(m_piggieTexture);
 		m_piggies.back()->SetTexture1(m_piggieTexture1);
-		m_piggies.back()->SetFireable(true);
 		m_piggies.back()->SetUserData();
 	}
 
 	//Create 1 seesaw joint
 	m_physicsSeesaw = std::make_shared<PhysicsSeesaw>(m_World.get(), glm::vec2(400.0f, 0.0f), glm::vec2(300.0f, 20.0f), 10.0f);
-	m_physicsSeesaw->SetTexture0(m_backgroundTexture);
+	m_physicsSeesaw->SetTexture0(m_boxTexture);
 }
 
 GameManager::~GameManager()
@@ -103,10 +113,11 @@ GameManager::~GameManager()
 	m_physicsBoxes.clear();
 	m_angryBoids.clear();
 
-	delete m_menuTitleText;
-	delete m_menuInstructText;
 	delete m_angryBoidTexture;
-	delete m_backgroundTexture;
+	delete m_boxTexture;
+	delete m_damagedBoxTexture;
+	delete m_piggieTexture;
+	delete m_piggieTexture1;
 }
 
 //Disable the audio for now
@@ -170,6 +181,12 @@ void GameManager::ProcessInput()
 		{
 			//Set game state to play
 			m_gameState = GAME_PLAY;
+		}
+
+		if (m_gameState == GAME_OVER)
+		{
+			m_gameState = GAME_PLAY;
+			Reset();
 		}
 	}
 
@@ -265,6 +282,8 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 		MoveNextFireableBoid();
 		RemoveDeadPiggies();
+		RemoveDamagedBoxes();
+		UpdateGameState();
 
 		//Update physics simulation only during play
 		m_World->Step(1.0f / 60.0f, 6, 6);
@@ -275,6 +294,16 @@ void GameManager::Update(int _mousePosX, int _mousePosY)
 
 	//Tell glut to call the render function again
 	glutPostRedisplay();
+}
+
+void GameManager::UpdateGameState()
+{
+	//Win/lose state
+	if ((m_boidsLeft == 0 && m_piggiesAlive > 0 && m_clock.GetTimeElapsedS() - m_timeOfLastFiredBoid > 5.0 && !m_lastSelectedBoid->GetBody()->IsAwake())
+		|| (m_piggiesAlive == 0 && m_clock.GetTimeElapsedS() - m_timeOfLastPiggieDeath > 5.0))
+	{
+		m_gameState = GAME_OVER;
+	}
 }
 
 void GameManager::Render()
@@ -289,12 +318,16 @@ void GameManager::Render()
 	}
 	else if (m_gameState == GAME_PLAY)
 	{
+		m_gameScoreText->Render();
 
 		m_physicsSeesaw->Render(*m_camera);
 
 		for (auto& pBox : m_physicsBoxes)
 		{
-			pBox->Render(*m_camera);
+			if (pBox->GetBody()->IsEnabled())
+			{
+				pBox->Render(*m_camera);
+			}
 		}
 
 		for (auto& pBoid : m_angryBoids)
@@ -318,6 +351,11 @@ void GameManager::Render()
 			glEnd();
 		}
 	}
+	else if (m_gameState == GAME_OVER)
+	{
+		m_gameOverTitleText->Render();
+		m_gameOverInstructText->Render();
+	}
 
 	glutSwapBuffers();
 	u_frameNum++;
@@ -340,15 +378,21 @@ void GameManager::Reset()
 	}
 
 	m_selectedBoid = nullptr;
+	m_lastSelectedBoid = nullptr;
 	m_nextBoidToFire = nullptr;
 
 	int i = 0;
 	for (auto box : m_physicsBoxes)
 	{
-		box->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(200.0f, -inputManager.HSCREEN_HEIGHT + 75.0f * i)), 0.0f);
-		box->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-		box->GetBody()->SetAngularVelocity(0.0f);
-		++i;
+		auto boxBody = box->GetBody();
+		boxBody->SetEnabled(true);
+		boxBody->SetTransform(Math::Vec2toBox2D(box->GetOriginalPosition()), 0.0f);
+		boxBody->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+		boxBody->SetAngularVelocity(0.0f);
+		boxBody->SetAwake(true);
+		box->SetDrawnTex(0);
+		box->SetTimeOfDeath(0.0);
+		box->SetIsDestroyed(false);
 	}
 	
 	i = 0;
@@ -381,6 +425,15 @@ void GameManager::Reset()
 
 	m_physicsSeesaw->GetBody()->SetTransform(Math::Vec2toBox2D(glm::vec2(400.0f, 0.0f)), 0.0f);
 	m_physicsSeesaw->GetBody()->SetAngularVelocity(0.0f);
+
+	m_gameScore = 0;
+	m_piggiesAlive = 4;
+	m_boidsLeft = 4;
+
+	//Update gamescore
+	std::string tempText = "Score: ";
+	tempText = tempText + std::to_string(m_gameScore);
+	m_gameScoreText->SetText(tempText);
 }
 
 void GameManager::CheckMouseToBoidCollisions()
@@ -412,6 +465,7 @@ void GameManager::CheckMouseToBoidCollisions()
 
 				//Set the currently selected boid to the angry boid
 				m_selectedBoid = angryBoid.get();
+				m_lastSelectedBoid = m_selectedBoid;
 				b2Body& angryBoidBody = *(angryBoid->GetBody());
 
 				//Set the boid body to dynamic so it can move
@@ -447,9 +501,7 @@ void GameManager::CheckMouseToBoidCollisions()
 		b2Vec2 newPos = Math::Vec2toBox2D(m_leftMouseDownPos + vecToMouse);
 		m_mouseJoint->SetTarget(newPos);
 
-
 		//Tried to draw a line to show which direction the bird is going to get shot
-
 		glm::vec2 forceVec = m_leftMouseDownPos - glm::vec2(inputManager.g_mousePosX, inputManager.g_mousePosY);
 		//forceVec *= 2;
 
@@ -476,6 +528,8 @@ void GameManager::CheckMouseToBoidCollisions()
 
 		//Calculate the force vector
 		glm::vec2 forceVec = m_leftMouseDownPos - m_leftMouseUpPos;
+
+		//Only do something when the mouse was moved
 		if (glm::length(forceVec) != 0)
 		{
 			forceVec *= boidBody.GetMass() * 100.0f;
@@ -483,24 +537,28 @@ void GameManager::CheckMouseToBoidCollisions()
 			//Apply the force to the angry boid so that it gets flung when the mouse is let go
 			boidBody.ApplyForce(Math::Vec2toBox2D(forceVec), boidBody.GetPosition(), true);
 			boidBody.SetGravityScale(1.0f);
-		}
 
-		m_selectedBoid->SetFireable(false);
-		
-		//Find the position of the selected boid in the vector (this will always find something)
-		auto iteratorToSelectedBoid = std::find_if(m_angryBoids.begin(), m_angryBoids.end(), 
-			[this](std::shared_ptr<AngryBoid> const& i) { return i.get() == m_selectedBoid; });
 
-		//If incrementing the iterator reaches the end, then the player has fired all the boids
-		if (++iteratorToSelectedBoid == m_angryBoids.end())
-		{
-			m_nextBoidToFire = nullptr;
-		}
-		//If incrementing the iterator does not reach the end, then there is another boid that can be fired
-		else
-		{
-			m_nextBoidToFire = iteratorToSelectedBoid->get();
-			m_timeOfLastFiredBoid = m_clock.GetTimeElapsedS();
+			//Decrement the bird counter
+			m_boidsLeft--;
+
+			m_selectedBoid->SetFireable(false);
+
+			//Find the position of the selected boid in the vector (this will always find something)
+			auto iteratorToSelectedBoid = std::find_if(m_angryBoids.begin(), m_angryBoids.end(),
+				[this](std::shared_ptr<AngryBoid> const& i) { return i.get() == m_selectedBoid; });
+
+			//If incrementing the iterator reaches the end, then the player has fired all the boids
+			if (++iteratorToSelectedBoid == m_angryBoids.end())
+			{
+				m_nextBoidToFire = nullptr;
+			}
+			//If incrementing the iterator does not reach the end, then there is another boid that can be fired
+			else
+			{
+				m_nextBoidToFire = iteratorToSelectedBoid->get();
+				m_timeOfLastFiredBoid = m_clock.GetTimeElapsedS();
+			}
 		}
 		m_selectedBoid = nullptr;
 	}
@@ -542,6 +600,14 @@ void GameManager::RemoveDeadPiggies()
 			//If the piggie has only just died set the time of death
 			if (!(piggie->GetTimeOfDeath() > 0.0))
 			{
+				//Update gamescore
+				m_gameScore++;
+				std::string tempText = "Score: ";
+				tempText = tempText + std::to_string(m_gameScore);
+				m_gameScoreText->SetText(tempText);
+
+				m_piggiesAlive--;
+				m_timeOfLastPiggieDeath = m_clock.GetTimeElapsedS();
 				piggie->SetTimeOfDeath(m_clock.GetTimeElapsedS());
 			}
 			else
@@ -556,7 +622,32 @@ void GameManager::RemoveDeadPiggies()
 				}
 			}
 		}
+	}
+}
 
+void GameManager::RemoveDamagedBoxes()
+{
+	for (auto& box : m_physicsBoxes)
+	{
+		if (box->GetDestructable() && box->GetIsDestroyed())
+		{
+			//If the piggie has only just died set the time of death
+			if (!(box->GetTimeOfDeath() > 0.0))
+			{
+				box->SetTimeOfDeath(m_clock.GetTimeElapsedS());
+			}
+			else
+			{
+				//If piggie has been dead for 2 seconds now
+				if (box->GetBody()->IsEnabled() && m_clock.GetTimeElapsedS() - box->GetTimeOfDeath() > 2.0)
+				{
+					//Disable the destroyed box
+					auto tempRef = box->GetBody();
+
+					tempRef->SetEnabled(false);
+				}
+			}
+		}
 	}
 }
 
@@ -567,7 +658,8 @@ void GameManager::CreateScreenBorderWalls()
 	b2BodyDef groundBodyDef;
 	groundBodyDef.position.Set(tempPos.x, tempPos.y);
 	b2Body* groundBody = m_World->CreateBody(&groundBodyDef);
-	// Make the ground fixture
+
+	//Make the ground fixture
 	auto tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	b2PolygonShape groundBox;
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
@@ -578,6 +670,7 @@ void GameManager::CreateScreenBorderWalls()
 	b2BodyDef leftWallBody;
 	leftWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&leftWallBody);
+
 	// Make the fixture
 	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
@@ -588,17 +681,18 @@ void GameManager::CreateScreenBorderWalls()
 	b2BodyDef rightWallBody;
 	rightWallBody.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&rightWallBody);
+
 	// Make the fixture
 	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);
 	groundBody->CreateFixture(&groundBox, 0.0f);
-
 
 	//Ground border
 	tempPos = Math::Vec2toBox2D(glm::vec2(0.0f, inputManager.SCREEN_HEIGHT));
 	b2BodyDef roofBodyDef;
 	roofBodyDef.position.Set(tempPos.x, tempPos.y);
 	groundBody = m_World->CreateBody(&roofBodyDef);
+
 	// Make the ground fixture
 	tempSize = Math::Vec2toBox2D(glm::vec2(inputManager.HSCREEN_WIDTH, inputManager.HSCREEN_HEIGHT));
 	groundBox.SetAsBox(tempSize.x, tempSize.y);

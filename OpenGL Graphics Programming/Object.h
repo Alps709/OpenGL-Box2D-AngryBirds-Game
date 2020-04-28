@@ -10,13 +10,14 @@
 //To be used for the physics objects
 struct PhysicsObjectData
 {
-	PhysicsObjectData(std::string _tag, Texture* _tex0, Texture* _tex1, Texture** _ptrToDrawnTex, bool* _died)
+	PhysicsObjectData(std::string _tag, Texture* _tex0, Texture* _tex1, Texture** _ptrToDrawnTex, bool* _died, bool _destructable)
 	{
 		m_tag = _tag;
 		m_tex0 = _tex0;
 		m_tex1 = _tex1;
 		m_ptrToDrawnTex = _ptrToDrawnTex;
 		m_hasDied = _died;
+		m_destructable = _destructable;
 	}
 
 	std::string m_tag;
@@ -24,6 +25,7 @@ struct PhysicsObjectData
 	Texture* m_tex0;
 	Texture* m_tex1;
 	bool* m_hasDied;
+	bool m_destructable;
 };
 
 class  Object

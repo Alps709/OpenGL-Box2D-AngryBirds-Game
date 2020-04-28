@@ -10,7 +10,9 @@ PhysicsCircle::PhysicsCircle(b2World* world, const glm::vec2& position, float _r
 	// Make the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_staticBody;
-	bodyDef.gravityScale = 0.0f;
+	bodyDef.gravityScale = 0.01f;
+	bodyDef.linearDamping = 0.05f;
+	bodyDef.angularDamping = 0.05f;
 	const auto tempPos = Math::Vec2toBox2D(position);
 	bodyDef.position.Set(tempPos.x, tempPos.y);
 	m_body = world->CreateBody(&bodyDef);
